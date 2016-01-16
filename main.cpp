@@ -1,9 +1,10 @@
-#include "manager.h"
-#include "profiler.h"
-//#include "progopimpl.h"
-
 #include <functional>
 #include <boost/date_time/posix_time/posix_time.hpp>
+
+#include "commandpromptparser.h"
+#include "manager.h"
+#include "profiler.h"
+
 
 using namespace boost::posix_time;
 
@@ -46,8 +47,14 @@ int IntLessCSTD(const void * a, const void * b)
     return ( *(int*) a - *(int*) b);
 }
 
-int main(int ac, char* av[])
+int main(int argc, char* argv[])
 {
+
+    CommandPromptParser promptParser(argc, argv);
+
+    return 0;
+
+
     int threadsCount = 1; //количество потоков, которое следует использовать
     //    для сортировки
     int size = 1000000; //задаём требуемый размер вектора
@@ -281,95 +288,4 @@ void DoSort4(int vecSize, Logger& logger, FillType type)
 }
 
 
-
-
-
-
-
-
-/////////////////////////////////////////
-
-
-
-//void doSortInt(int threadsCount, int vecSize, Logger& logger, FillType type)
-//{
-//    stringType stringImpl;
-//
-//    switch (threadsCount)
-//    {
-//        case 1: stringImpl = pOnethread;
-//            break;
-//        case 2: stringImpl = pTwothreads;
-//            break;
-//        case 4: stringImpl = pFourthreads;
-//            break;
-//        default:
-//        {
-//            cout << "Unknown count of threads!";
-//            return;
-//        }
-//    }
-
-
-//    Manager mn1(threadsCount);
-//    //    cout << "vecsize = " << vecSize << endl;
-//    if (type == fullSort) mn1.initVec(vecSize);
-//    else mn1.initVecHalf(vecSize);
-//    mn1.addWork(vecSize);
-//
-//    pthread_t *threads = new pthread_t[threadsCount];
-//
-//    Prof prof;
-//    startAll(threads, threadsCount, mn1);
-//    logger.GetTime(stringImpl, prof.StopAndGet());
-//
-//    CheckSorted(mn1.vec, mn1.vec.size());
-//
-//
-//    delete []threads;
-//}
-//
-//void doSortString(int threadsCount, Logger& logger, std::string path)
-//{
-//    stringType stringImpl;
-//
-//    switch (threadsCount)
-//    {
-//        case 1: stringImpl = pOnethread;
-//            break;
-//        case 2: stringImpl = pTwothreads;
-//            break;
-//        case 4: stringImpl = pFourthreads;
-//            break;
-//        default:
-//        {
-//            cout << "Unknown count of threads!";
-//            return;
-//        }
-//    }
-//    //"COPYING"
-//    std::ifstream inputFile(path);
-//    std::string str;
-//    Manager mn1(threadsCount);
-//
-//    while (inputFile >> str) mn1.vecStr.push_back(str);
-//
-//    mn1.addWork(mn1.vecStr.size());
-//
-//    //    cout << "vecsize = " << vecSize << endl;
-//
-//    pthread_t *threads = new pthread_t[threadsCount];
-//
-//    Prof prof;
-//    startAll(threads, threadsCount, mn1, SortingTask::string);
-//    logger.GetTime(stringImpl, prof.StopAndGet());
-//
-//    CheckSorted(mn1.vecStr, mn1.vecStr.size());
-//    //    for (int i = 0; i < mn1.vecStr.size(); ++i)
-//    //    {
-//    //        cout << mn1.vecStr[i] << " ";
-//    //    }
-//
-//    delete []threads;
-//}
 

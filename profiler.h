@@ -61,9 +61,4 @@ private:
     Logger& operator=(const Logger& rhs); //присваивание запрещено
 };
 
-enum FillType //определяет способ заполнения вектора. fullSort - полное запол-
-{               //нение случаными зачениями
-    fullSort, halfSort //halfSort 1я половина отсортирована, вторая заполнена
-};              //случайными значениями
-
 #endif  /* PROFILER_H */
