@@ -1,7 +1,10 @@
 #ifndef COMMANDPROMTPARSER_H
 #define COMMANDPROMTPARSER_H
 
-#include "progopimpl.h"
+enum FillType //определяет способ заполнения вектора. fullSort - полное запол-
+{               //нение случаными зачениями
+    fullSort, halfSort //halfSort 1я половина отсортирована, вторая заполнена
+};              //случайными значениями
 
 struct ParsedParams
 {
@@ -14,6 +17,16 @@ struct ParsedParams
     FillType type;
 
 };
+
+template<typename T2, typename T1>
+inline T2 lexical_cast(const T1 &in)
+{
+    T2 out;
+    std::stringstream ss;
+    ss << in;
+    ss >> out;
+    return out;
+}
 
 class CommandPromptParser
 {

@@ -19,16 +19,14 @@ TEMPLATE = app
 SOURCES += main.cpp \
     manager.cpp \
     profiler.cpp \
-    progopimpl.cpp \
     commandpromptparser.cpp
 
 HEADERS += \
     manager.h \
     profiler.h \
     sortimpl.h \
-    progopimpl.h \
     commandpromptparser.h
 
 #LIBS += -L/usr/lib -llibboost_program_options
 
-unix:!macx: LIBS += -lboost_program_options
+unix:!macx: LIBS += -lboost_program_options -lpthread

@@ -49,67 +49,130 @@ void Prof::PrintMeas()
 }
 
 
-/////////////////
+////////////////
 //logger impl//
-/////////////////
+///////////////
 
-void PrintTotalTime(const std::pair<stringType,
-        double> pair, double minValue);
+double GetMinValue(std::vector<double> vec);
+double GetMaxValue(std::vector<double> vec);
+double GetAvgValue(std::vector<double> vec);
 
-void Logger::GetTime(stringType type, double val)
+void PrintLine(int lengh = 54)
 {
-    vec.push_back(std::make_pair(type, val));
+    for (int i = 0; i < lengh; ++i)
+    {
+        cout << "-";
+    }
+    cout << endl;
 }
 
-void Logger::PrintTime()
-{
-    GetMinValue();
-    cout << endl << "Impl type" << "          "
-            << "elapsed time   difference" << endl << endl;
+void PrintTotalTime(std::pair<int, Values> pair, double stlAvg);
 
-    std::for_each(vec.begin(), vec.end(), std::bind2nd(
-            std::ptr_fun(PrintTotalTime), minValue_)
+void Logger::Reset()
+{
+    map.clear();
+    mapRes.clear();
+}
+
+void Logger::GetValues()
+{
+    for (std::map<int, std::vector<double> >::iterator it = map.begin();
+            it != map.end(); ++it)
+    {
+        mapRes[it->first].min = GetMinValue(it->second);
+        mapRes[it->first].max = GetMaxValue(it->second);
+        mapRes[it->first].avg = GetAvgValue(it->second);
+    }
+}
+
+void Logger::GetTime(int threadCount, double val)
+{
+    map[threadCount].push_back(val);
+}
+
+void Logger::PrintTime(int vecSize, int loopCount)
+{
+    GetValues();
+    PrintLine();
+    cout << "      " << "vector size = " << vecSize << "; "
+            << "count of loop = " << loopCount << endl;
+    PrintLine();
+
+    cout << endl << "Impl type" << "          "
+            << "Min        Max        Avg" << endl << endl;
+    std::for_each(mapRes.begin(), mapRes.end(),
+            std::bind2nd((std::ptr_fun(PrintTotalTime)), mapRes[0].avg)
             );
 
 }
 
-void Logger::GetMinValue()
+void PrintTotalTime(std::pair<int, Values> pair, double stlAvg)
+{
+    switch (pair.first)
+    {
+        case 0: cout << "STL impl" << "           ";
+            break;
+        default:
+            cout << pair.first << " threads impl" << "     ";
+
+    }
+    cout << std::fixed << std::setprecision(3);
+    cout << pair.second.min << "s     " << pair.second.max << "s     "
+            << pair.second.avg << "s ";
+
+    if (!pair.first) cout << "STL" << endl;
+    else if (pair.second.avg > stlAvg && stlAvg) cout << "-" <<
+            static_cast<int> ((pair.second.avg - stlAvg) / stlAvg * 100)
+            << "%" << endl;
+    else if (pair.second.avg <= stlAvg && stlAvg)cout << "+" <<
+            static_cast<int> ((stlAvg - pair.second.avg) / pair.second.avg * 100)
+            << "%" << endl;
+}
+
+double GetMinValue(std::vector<double> vec)
 {
     if (vec.empty())
     {
         cout << "vector is empty!" << endl;
-        return;
+        return -1;
     }
-    minValue_ = vec[0].second;
+    double minValue = vec[0];
     for (int i = 0; i < static_cast<int> (vec.size()); ++i)
     {
-        if (vec[i].second < minValue_) minValue_ = vec[i].second;
+        if (vec[i] < minValue) minValue = vec[i];
     }
+    return minValue;
 }
 
-void PrintTotalTime(const std::pair<stringType,
-        double> pair, double minValue)
+double GetMaxValue(std::vector<double> vec)
 {
-    switch (pair.first)
+    if (vec.empty())
     {
-        case pCqsort: cout << "Cqsort impl" << "        ";
-            break;
-        case pStl: cout << "STL impl" << "           ";
-            break;
-        case pOnethread: cout << "Onethread impl" << "     ";
-            break;
-        case pTwothreads: cout << "Twothreads impl" << "    ";
-            break;
-        case pFourthreads: cout << "Fourthreads impl" << "   ";
-            break;
+        cout << "vector is empty!" << endl;
+        return -1;
     }
-    cout << std::fixed << std::setprecision(3);
-    cout << pair.second << "s         ";
-    if (minValue < pair.second) cout << "+" << pair.second - minValue
-            << "s" << " ("
-            << static_cast<int>((pair.second - minValue)/minValue*100)
-            << "%)" << endl;
-
-    else cout << "it's top time!" << endl;
-
+    double maxValue = vec[0];
+    for (int i = 0; i < static_cast<int> (vec.size()); ++i)
+    {
+        if (vec[i] > maxValue) maxValue = vec[i];
+    }
+    return maxValue;
 }
+
+double GetAvgValue(std::vector<double> vec)
+{
+    if (vec.empty())
+    {
+        cout << "vector is empty!" << endl;
+        return -1;
+    }
+    double avgValue = 0;
+
+    for (int i = 0; i < static_cast<int> (vec.size()); ++i)
+    {
+        avgValue += vec[i];
+    }
+    avgValue /= static_cast<int> (vec.size());
+    return avgValue;
+}
+
