@@ -7,10 +7,10 @@
 #include "profiler.h"
 #include "commandpromptparser.h"
 
-using namespace std;
+//using namespace std;
 
 void startAll(pthread_t *threads, int threadsCount, Manager &mn,
-        SortingTask::dType type = SortingTask::integer);
+              SortingTask::dType type = SortingTask::integer);
 //принимает указатель на массив переменных pthread_t, кол-во потоков, которые
 //необходимо создать, тип данных в сортируемом вектора integer, либо string
 void waitAll(pthread_t *threads, int threadsCount);
@@ -23,12 +23,14 @@ template <typename T>
 void CheckSorted(std::vector<T> data, int size);
 //проверяет отсортирован ли массив, если нет - выводит информацию в консоль
 void doSortInt(std::vector<int> vec, int threadsCount, Logger& logger,
-        vector< pair<vector<int>, int> >& globalVec, FillType type);
+               std::vector<std::pair<std::vector<int>, int> >& globalVec,
+               FillType type);
 //содержит все необходимые действия для запуска сортировки целых чисел
 //принимает Количество потоков, размер сортирумого вектора, ссылку на логер
 //тип заполнения (см. FillType), который необходимо применить к вектору
 void doSTLsort(std::vector<int> vec, Logger& logger,
-        vector< pair<vector<int>, int> >& globalVec, FillType type);
+               std::vector<std::pair<std::vector<int>, int> >& globalVec,
+               FillType type);
 //содержит все необходимые действия для запуска сортировки целых чисел при помощи
 //STL, принимает размер вектора, ссылку на Логгер, тип заполнения вектора
 void doSortString(int threadsCount, Logger& logger, std::string path);
@@ -43,74 +45,70 @@ struct VectorSaver
     std::vector< std::pair<std::vector<int>, int> > vec;
     void SaveResToFile(std::vector<int>& vecInt,
             int thrCount, int mesNum);
-
 };
 
 int main(int argc, char* argv[])
 {
-//    vector< pair<vector<int>, int> > globalVec;
     VectorSaver vecSaver;
-
-    int threadsCount = 2;
-    int vecSize = 900000;
-    int vecSizeEnd = 1000000;
-    int incStep = 10000;
-    int loopCount = 1;
-    int thrCountInTest = 0;
-    Logger logger;
-    FillType fType = fullSort;
 
     CommandPromptParser promptParser(argc, argv);
     const ParsedParams params(promptParser.getParams());
 
-//    if (DoPars(argc, argv, &vecSize, &vecSizeEnd,
-//            &incStep, &loopCount, &threadsCount,
-//            &thrCountInTest, &fType)) return 0;
-
-    Manager mn1(threadsCount);
-    mn1.initVec(vecSize);
+    Manager mn1(params.threadsCount);
+    mn1.initVec(params.firstVecSize);
     //    mn1.addWork(vecSize);
+    Logger logger;
+
+    size_t vecSize = params.firstVecSize;
+    size_t thrCountInTest = params.thrCountInTest;
 
     do
     {
         logger.Reset();
-        for (int i = 0; i < loopCount; ++i)
+
+        for (size_t i = 0; i < params.loopCount; ++i)
         {
-            doSTLsort(mn1.vec, logger, vecSaver.vec, fType);
+            doSTLsort(mn1.vec, logger, vecSaver.vec, params.type);
 
             if (thrCountInTest)
             {
                 int temp = thrCountInTest;
-                for (int i = 2; i < thrCountInTest + 1; thrCountInTest /= 2)
+                for (size_t i = 2; i < thrCountInTest + 1;
+                     thrCountInTest /= 2)
                 {
                     doSortInt(mn1.vec, thrCountInTest, logger,
-                            vecSaver.vec, fType);
+                            vecSaver.vec, params.type);
                 }
                 thrCountInTest = temp;
-            } else
-            {
-                doSortInt(mn1.vec, threadsCount, logger, vecSaver.vec, fType);
             }
-
+            else
+            {
+                doSortInt(mn1.vec, params.threadsCount, logger,
+                          vecSaver.vec, params.type);
+            }
         }
-        logger.PrintTime(vecSize, loopCount);
-        vecSize += incStep;
+
+        logger.PrintTimeTable(vecSize, params.loopCount);
+        vecSize += params.incStep;
+
         mn1.vec.clear();
         mn1.initVec(vecSize);
     }
-    while (vecSize < vecSizeEnd + 1);
-    cout << endl;
+    while (vecSize < params.lastVecSize + 1);
+
+    std::cout << std::endl;
+
     for (int i = 0; i < static_cast<int> (vecSaver.vec.size()); ++i)
     {
         vecSaver.SaveResToFile(vecSaver.vec[i].first, vecSaver.vec[i].second, i);
     }
+
     return 0;
 }
 
 void doSTLsort(std::vector<int> vec, Logger& logger,
-        vector< pair<vector<int>, int> >& globalVec, FillType type)
+        std::vector<std::pair<std::vector<int>, int> >& globalVec, FillType type)
 {
-    //    cout << "vecsize in STLsort = " << vec.size() << endl;
     int nothread = 0;
     Manager mn1(nothread);
 
@@ -121,16 +119,17 @@ void doSTLsort(std::vector<int> vec, Logger& logger,
 
     mn1.vec = vec;
     mn1.addWork(vec.size());
+
     Prof prof;
     std::sort(mn1.vec.begin(), mn1.vec.end() , IntLess);
-    logger.GetTime(0, prof.StopAndGet());
+    logger.SaveTime(Logger::PosOfStlMeasure, prof.StopAndGetDifference());
+
     CheckSorted(mn1.vec, mn1.vec.size());
     globalVec.push_back(make_pair(mn1.vec, nothread));
-
 }
 
 void doSortInt(std::vector<int> vec, int threadsCount, Logger& logger,
-        vector< pair<vector<int>, int> >& globalVec, FillType type)
+        std::vector<std::pair<std::vector<int>, int> >& globalVec, FillType type)
 {
     //    cout << "vecsize in INTsort = " << vec.size() << endl;
     Manager mn1(threadsCount);
@@ -148,7 +147,7 @@ void doSortInt(std::vector<int> vec, int threadsCount, Logger& logger,
 
     Prof prof;
     startAll(threads, threadsCount, mn1);
-    logger.GetTime(threadsCount, prof.StopAndGet());
+    logger.SaveTime(threadsCount, prof.StopAndGetDifference());
     globalVec.push_back(make_pair(mn1.vec, threadsCount));
     CheckSorted(mn1.vec, mn1.vec.size());
 
@@ -206,18 +205,18 @@ void startAll(pthread_t *threads, int threadsCount, Manager &mn,
 
 void VectorSaver::SaveResToFile(std::vector<int>& vec, int thrCount, int mesNum)
 {
-    string str1("./test/");
+    std::string str1("./test/");
     mkdir(str1.c_str(), 0777);
     str1.append("_thrCount");
     str1.append(::lexical_cast<std::string, int>(thrCount));
     str1.append("_mesNum");
     str1.append(::lexical_cast<std::string, int>(mesNum));
-    std::ofstream output(str1, ios::binary);
+    std::ofstream output(str1, std::ios::binary);
 
     if (output.is_open())
     {
-        copy(vec.begin(), vec.end(),
-                ostream_iterator<int>(output, "\n"));
+        std::copy(vec.begin(), vec.end(),
+                  std::ostream_iterator<int>(output, "\n"));
         output.close();
     }
 }

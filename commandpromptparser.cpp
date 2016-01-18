@@ -43,23 +43,23 @@ ParsedParams CommandPromptParser::getParamsFormArgs(int argc, char* argv[])
         po::options_description desc("Allowed options");
         desc.add_options()
                 ("help", "produce help message")
-                ("firstVecSize", po::value<int>(
+                ("firstVecSize", po::value<size_t>(
                      &params.firstVecSize)->default_value(1000000),
                 "size of vector to sort")
-                ("lastVecSize", po::value<int>(
+                ("lastVecSize", po::value<size_t>(
                      &params.lastVecSize)->default_value(1000000),
                 "value of last of vectors, when using incrementing")
-                ("incrementing_step", po::value<int>(
+                ("incrementing_step", po::value<size_t>(
                      &params.incStep)->default_value(1),
                 "incrementing_step")
-                ("loop_count", po::value<int>(
+                ("loop_count", po::value<size_t>(
                      &params.loopCount)->default_value(1),
                 "count of loop")
-                ("count_threads", po::value<int>(
-                     &params.thCount)->default_value(2),
+                ("count_threads", po::value<size_t>(
+                     &params.threadsCount)->default_value(2),
                 "count of threads to use")
                 ("test_threads_count",
-                po::value<int>(&params.thrCountInTest)->default_value(0),
+                po::value<size_t>(&params.thrCountInTest)->default_value(0),
                 "count of threads to use at the same time")
                 ("fill_type", po::value<int>(&fillType)->default_value(0),
                 "type of filling vector(0-full, 1-half)")
