@@ -3,8 +3,8 @@
 #include <vector>
 #include <iostream>
 
-using std::cout;
-using std::endl;
+//using std::cout;
+//using std::endl;
 
 static const int M = 15;
 
@@ -43,10 +43,10 @@ void quicksort(std::vector<T>& a, int* start, int* end, int* i)
 {
     if (*end <= *start)
     {
-        cout << "in qsort end <= start" << endl;
-        cout << "start = " << *start << endl;
-        cout << "i = " << *i << endl;
-        cout << "end = " << *end << endl;
+        std::cout << "in qsort end <= start" << std::endl;
+        std::cout << "start = " << *start << std::endl;
+        std::cout << "i = " << *i << std::endl;
+        std::cout << "end = " << *end << std::endl;
 
         return;
     }
