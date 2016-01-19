@@ -19,13 +19,15 @@ TEMPLATE = app
 SOURCES += main.cpp \
     manager.cpp \
     profiler.cpp \
-    commandpromptparser.cpp
+    commandpromptparser.cpp \
+    sort.cpp
 
 HEADERS += \
     manager.h \
     profiler.h \
     sortimpl.h \
-    commandpromptparser.h
+    commandpromptparser.h \
+    sort.h
 
 #LIBS += -L/usr/lib -llibboost_program_options
 
