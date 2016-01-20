@@ -9,7 +9,6 @@
 
 Prof::Prof() /*: measValue_(0)*/
 {
-    StartMeas();
 }
 
 void Prof::StopAndPrint()
@@ -107,43 +106,79 @@ void PrintLine(int lengh = 54)
 
 void PrintTotalTime(std::pair<int, Values> pair, double stlAvg);
 
+Logger::Logger()
+    : m_threadCount(0)
+    , m_iteartionCount(0)
+{
+}
+
 void Logger::Reset()
 {
-    map.clear();
-    mapRes.clear();
+    measureMap.clear();
+    m_mapRes.clear();
 }
 
 void Logger::GetValues()
 {
-    for (std::map<int, std::vector<double> >::iterator it = map.begin();
-            it != map.end(); ++it)
+    for (std::map<int, std::vector<double> >::iterator it = measureMap.begin();
+            it != measureMap.end(); ++it)
     {
         assert(!it->second.empty());
 
         MinMaxAvg minMaxAvg = GetMinMaxAvg(it->second);
-        mapRes[it->first].min = minMaxAvg.min;
-        mapRes[it->first].max = minMaxAvg.max;
-        mapRes[it->first].avg = minMaxAvg.avg;
+        m_mapRes[it->first].min = minMaxAvg.min;
+        m_mapRes[it->first].max = minMaxAvg.max;
+        m_mapRes[it->first].avg = minMaxAvg.avg;
     }
 }
-
-void Logger::SaveTime(int threadCount, double time)
+int Logger::iteartionCount() const
 {
-    map[threadCount].push_back(time);
+    return m_iteartionCount;
 }
 
-void Logger::PrintTimeTable(int vecSize, int loopCount)
+void Logger::setIteartionCount(int iteartionCount)
 {
-    GetValues();
+    m_iteartionCount = iteartionCount;
+}
+
+int Logger::threadCount() const
+{
+    return m_threadCount;
+}
+
+void Logger::setThreadCount(int threadCount)
+{
+    m_threadCount = threadCount;
+}
+
+const std::map<int, std::vector<double> >& Logger::measureMap() const
+{
+    return m_map;
+}
+
+void Logger::SaveTime(double time)
+{
+    measureMap[m_threadCount].push_back(time);
+}
+
+void Logger::PrintTableHead(int vecSize, int loopCount)
+{
     PrintLine();
     std::cout << "      " << "vector size = " << vecSize << "; "
             << "count of loop = " << loopCount << std::endl;
     PrintLine();
+}
+
+void Logger::PrintTimeTable()
+{
+    // TODO: change data structure for supporting new log format;
+//    PrintTableHead();
+    GetValues();
 
     std::cout << std::endl << "Impl type" << "          "
             << "Min        Max        Avg" << std::endl << std::endl;
-    std::for_each(mapRes.begin(), mapRes.end(),
-        std::bind2nd((std::ptr_fun(PrintTotalTime)), mapRes[PosOfStlMeasure].avg)
+    std::for_each(m_mapRes.begin(), m_mapRes.end(),
+        std::bind2nd((std::ptr_fun(PrintTotalTime)), m_mapRes[PosOfStlMeasure].avg)
         );
 }
 

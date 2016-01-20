@@ -7,8 +7,6 @@
 #include "profiler.h"
 #include "commandpromptparser.h"
 
-//using namespace std;
-
 void startAll(pthread_t *threads, int threadsCount, Manager &mn,
               SortingTask::dType type = SortingTask::integer);
 //принимает указатель на массив переменных pthread_t, кол-во потоков, которые

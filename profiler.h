@@ -40,24 +40,38 @@ class Logger
 public:
     static const int PosOfStlMeasure = 0;
 
-    Logger() { }
-    void SaveTime(int threadCount, double time);
-    void PrintTimeTable(int vecSize, int loopCount = 1);
+    Logger();
+    void SaveTime(double time);
+    void PrintTableHead(int vecSize, int loopCount = 1);
+    void PrintTimeTable();
     void Reset();
 
-    //содержит пары значений
-    //количество потоков (0 - STL), время сортировки
-    std::map<int, std::vector<double> > map;
+    const std::map<int, std::vector<double> >& measureMap() const;
+
+    int threadCount() const;
+    void setThreadCount(int threadCount);
+
+    int iteartionCount() const;
+    void setIteartionCount(int iteartionCount);
 
 private:
     //анализирует результаты всех проведённых тестов,
     //сохранённые в map, расчитывает мин, макс и среднее время
     void GetValues();
-    //содержит результаты измерений, в виде
-    //пары - колво потоков, мин, макс среднее значение
-    std::map<int, Values> mapRes;
-    
+
     Logger(const Logger& rhs); //копирование запрещено
     Logger& operator=(const Logger& rhs); //присваивание запрещено
+
+private:
+    //содержит пары значений
+    //количество потоков (0 - STL), время сортировки
+    std::map<int, std::vector<double> > m_map;
+
+    //содержит результаты измерений, в виде
+    //пары - колво потоков, мин, макс среднее значение
+    std::map<int, Values> m_mapRes;
+    
+    int m_threadCount;
+    int m_iteartionCount;
 };
 #endif  /* PROFILER_H */

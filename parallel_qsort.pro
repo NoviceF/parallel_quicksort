@@ -20,14 +20,16 @@ SOURCES += main.cpp \
     manager.cpp \
     profiler.cpp \
     commandpromptparser.cpp \
-    sort.cpp
+    sort.cpp \
+    sorttest.cpp
 
 HEADERS += \
     manager.h \
     profiler.h \
     sortimpl.h \
     commandpromptparser.h \
-    sort.h
+    sort.h \
+    sorttest.h
 
 #LIBS += -L/usr/lib -llibboost_program_options
 
