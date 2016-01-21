@@ -81,7 +81,8 @@ CSort<T>::CSort(std::vector<T>& vecToSort, Logger& logger)
     : SortBase<T>(vecToSort, logger)
 {}
 
-void CSort::doSort()
+template <typename T>
+void CSort<T>::doSort()
 {
 
 }

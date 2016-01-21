@@ -114,22 +114,22 @@ Logger::Logger()
 
 void Logger::Reset()
 {
-    measureMap.clear();
-    m_mapRes.clear();
+//    measureMap.clear();
+//    m_mapRes.clear();
 }
 
 void Logger::GetValues()
 {
-    for (std::map<int, std::vector<double> >::iterator it = measureMap.begin();
-            it != measureMap.end(); ++it)
-    {
-        assert(!it->second.empty());
+//    for (std::map<int, std::vector<double> >::iterator it = measureMap.begin();
+//            it != measureMap.end(); ++it)
+//    {
+//        assert(!it->second.empty());
 
-        MinMaxAvg minMaxAvg = GetMinMaxAvg(it->second);
-        m_mapRes[it->first].min = minMaxAvg.min;
-        m_mapRes[it->first].max = minMaxAvg.max;
-        m_mapRes[it->first].avg = minMaxAvg.avg;
-    }
+//        MinMaxAvg minMaxAvg = GetMinMaxAvg(it->second);
+//        m_mapRes[it->first].min = minMaxAvg.min;
+//        m_mapRes[it->first].max = minMaxAvg.max;
+//        m_mapRes[it->first].avg = minMaxAvg.avg;
+//    }
 }
 int Logger::iteartionCount() const
 {
@@ -158,7 +158,7 @@ const std::map<int, std::vector<double> >& Logger::measureMap() const
 
 void Logger::SaveTime(double time)
 {
-    measureMap[m_threadCount].push_back(time);
+//    measureMap[m_threadCount].push_back(time);
 }
 
 void Logger::PrintTableHead(int vecSize, int loopCount)
