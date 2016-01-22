@@ -54,8 +54,13 @@ int main(int argc, char* argv[])
 
     CommandPromptParser promptParser(argc, argv);
     const ParsedParams params(promptParser.getParams());
+    Logger logger;
 
     SingleThreadSortTest<CSort<int> > csortTest(params);
+    csortTest.runTest(logger);
+
+
+
 
 
 
@@ -128,6 +133,7 @@ int main(int argc, char* argv[])
 
 //    Prof prof;
 //    std::sort(mn1.vec.begin(), mn1.vec.end() , IntLess);
+
 ////    logger.SaveTime(Logger::PosOfStlMeasure, prof.StopAndGetDifference());
 
 //    CheckSorted(mn1.vec, mn1.vec.size());

@@ -93,6 +93,9 @@ ParsedParams CommandPromptParser::getParamsFormArgs(int argc, char* argv[])
             params.loopCount = ::lexical_cast<int, std::string> (vecStr[3]);
             params.thrCountInTest = ::lexical_cast<int, std::string> (vecStr[4]);
             params.type = static_cast<FillType>(fillType);
+
+            if (!params.incStep)
+                params.incStep = 1;
         }
         else
         {

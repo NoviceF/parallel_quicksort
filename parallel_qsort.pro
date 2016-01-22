@@ -19,9 +19,7 @@ TEMPLATE = app
 SOURCES += main.cpp \
     manager.cpp \
     profiler.cpp \
-    commandpromptparser.cpp \
-    sort.cpp \
-    sorttest.cpp
+    commandpromptparser.cpp
 
 HEADERS += \
     manager.h \
