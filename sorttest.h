@@ -64,6 +64,7 @@ public:
 
         do
         {
+            logger.setElementsCount(vecSize);
             std::vector<int> vecToSort;
             m_testParams.type == fullSort
                     ? fillVectorFullRandom(vecToSort, vecSize)
@@ -83,6 +84,7 @@ private:
 
         for (size_t i = 0; i < m_testParams.loopCount; ++i)
         {
+            logger.setIteartionIndex(i);
             sort.makeSort();
         }
     }

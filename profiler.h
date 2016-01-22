@@ -28,50 +28,62 @@ private:
 
 ///////////logger
 
-struct Values //структура для хранения значений времени
-{
-    double min;
-    double max;
-    double avg;
-};
-
 class Logger
 {
 public:
     static const int PosOfStlMeasure = 0;
 
     Logger();
-    void SaveTime(double time);
-    void PrintTableHead(int vecSize, int loopCount = 1);
+    void SaveTime(double executionTime);
+//    void PrintTableHead(int vecSize, int loopCount = 1);
     void PrintTimeTable();
     void Reset();
 
-    const std::map<int, std::vector<double> >& measureMap() const;
+    std::string sortName() const;
+    void setSortName(const std::string& sortName);
 
-    int threadCount() const;
-    void setThreadCount(int threadCount);
+    size_t elementsCount() const;
+    void setElementsCount(const size_t& elementsCount);
 
-    int iteartionCount() const;
-    void setIteartionCount(int iteartionCount);
+    size_t threadCount() const;
+    void setThreadCount(size_t threadCount);
+
+    size_t iteartionIndex() const;
+    void setIteartionIndex(size_t iteartionIndex);
 
 private:
     //анализирует результаты всех проведённых тестов,
     //сохранённые в map, расчитывает мин, макс и среднее время
-    void GetValues();
+    void CalcValues();
 
     Logger(const Logger& rhs); //копирование запрещено
     Logger& operator=(const Logger& rhs); //присваивание запрещено
 
 private:
-    //содержит пары значений
-    //количество потоков (0 - STL), время сортировки
-    std::map<int, std::vector<double> > m_map;
 
-    //содержит результаты измерений, в виде
-    //пары - колво потоков, мин, макс среднее значение
-    std::map<int, Values> m_mapRes;
-    
-    int m_threadCount;
-    int m_iteartionCount;
+    struct LogValue
+    {
+        size_t iterationIndex;
+        double runningTime;
+    };
+
+    // MAP sort name ->
+    //      MAP count of elements ->
+    //          PAIR threads count -> [iteration index, time diff] ENDPAIR
+    //      ENDMAP
+    // ENDMAP
+
+    typedef std::string SortName;
+    typedef std::vector<LogValue> LogValueCollection;
+    typedef size_t ThreadsCount;
+    typedef size_t ElementsCount;
+
+    std::map<SortName, std::map<ElementsCount,
+            std::map<ThreadsCount, LogValueCollection > > > m_logMap;
+
+    std::string m_sortName;
+    size_t m_elementsCount;
+    size_t m_threadsCount;
+    size_t m_iterationIndex;
 };
 #endif  /* PROFILER_H */

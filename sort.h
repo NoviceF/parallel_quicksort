@@ -16,6 +16,8 @@ class ISort
 public:
     virtual void makeSort() = 0;
     virtual ~ISort() = 0;
+
+    virtual std::string name() const = 0;
 };
 
 inline ISort::~ISort()
@@ -46,6 +48,7 @@ public:
 private:
     virtual void doPreSort()
     {
+        m_logger.setSortName(name());
         m_profiler.StartMeas();
     }
 
@@ -111,7 +114,6 @@ private:
     int m_threadsCount;
 };
 
-
 template <typename T>
 class CSort : public SingleThreadSort<T>
 {
@@ -136,6 +138,11 @@ public:
                 else return 1;
             }
         );
+    }
+
+    std::string name() const override
+    {
+        return "CSort";
     }
 };
 

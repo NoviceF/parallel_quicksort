@@ -104,11 +104,13 @@ void PrintLine(int lengh = 54)
     std::cout << std::endl;
 }
 
-void PrintTotalTime(std::pair<int, Values> pair, double stlAvg);
+//void PrintTotalTime(std::pair<int, Values> pair, double stlAvg);
 
 Logger::Logger()
-    : m_threadCount(0)
-    , m_iteartionCount(0)
+    : m_sortName("default sort name")
+    , m_elementsCount(0)
+    , m_threadsCount(0)
+    , m_iterationIndex(0)
 {
 }
 
@@ -118,7 +120,7 @@ void Logger::Reset()
 //    m_mapRes.clear();
 }
 
-void Logger::GetValues()
+void Logger::CalcValues()
 {
 //    for (std::map<int, std::vector<double> >::iterator it = measureMap.begin();
 //            it != measureMap.end(); ++it)
@@ -131,83 +133,106 @@ void Logger::GetValues()
 //        m_mapRes[it->first].avg = minMaxAvg.avg;
 //    }
 }
-int Logger::iteartionCount() const
+
+std::string Logger::sortName() const
 {
-    return m_iteartionCount;
+    return m_sortName;
 }
 
-void Logger::setIteartionCount(int iteartionCount)
+void Logger::setSortName(const std::string& sortName)
 {
-    m_iteartionCount = iteartionCount;
+    m_sortName = sortName;
 }
 
-int Logger::threadCount() const
+size_t Logger::elementsCount() const
 {
-    return m_threadCount;
+    return m_elementsCount;
 }
 
-void Logger::setThreadCount(int threadCount)
+void Logger::setElementsCount(const size_t& elementsCount)
 {
-    m_threadCount = threadCount;
+    m_elementsCount = elementsCount;
 }
 
-const std::map<int, std::vector<double> >& Logger::measureMap() const
+size_t Logger::iteartionIndex() const
 {
-    return m_map;
+    return m_iterationIndex;
 }
 
-void Logger::SaveTime(double time)
+void Logger::setIteartionIndex(size_t iteartionIndex)
+{
+    m_iterationIndex = iteartionIndex;
+}
+
+size_t Logger::threadCount() const
+{
+    return m_threadsCount;
+}
+
+void Logger::setThreadCount(size_t threadCount)
+{
+    m_threadsCount = threadCount;
+}
+
+//const std::map<int, std::vector<double> >& Logger::measureMap() const
+//{
+//    return m_map;
+//}
+
+void Logger::SaveTime(double executionTime)
 {
 //    measureMap[m_threadCount].push_back(time);
+    m_logMap[m_sortName][m_elementsCount][m_threadsCount].push_back(
+        { m_iterationIndex, executionTime });
 }
 
-void Logger::PrintTableHead(int vecSize, int loopCount)
-{
-    PrintLine();
-    std::cout << "      " << "vector size = " << vecSize << "; "
-            << "count of loop = " << loopCount << std::endl;
-    PrintLine();
-}
+//void Logger::PrintTableHead(int vecSize, int loopCount)
+//{
+//    PrintLine();
+//    std::cout << "      " << "vector size = " << vecSize << "; "
+//            << "count of loop = " << loopCount << std::endl;
+//    PrintLine();
+//}
 
 void Logger::PrintTimeTable()
 {
     // TODO: change data structure for supporting new log format;
 //    PrintTableHead();
-    GetValues();
+//    CalcValues();
 
-    std::cout << std::endl << "Impl type" << "          "
-            << "Min        Max        Avg" << std::endl << std::endl;
-    std::for_each(m_mapRes.begin(), m_mapRes.end(),
-        std::bind2nd((std::ptr_fun(PrintTotalTime)), m_mapRes[PosOfStlMeasure].avg)
-        );
+//    std::cout << std::endl << "Impl type" << "          "
+//            << "Min        Max        Avg" << std::endl << std::endl;
+//    std::for_each(m_mapRes.begin(), m_mapRes.end(),
+//        std::bind2nd((std::ptr_fun(PrintTotalTime)), m_mapRes[PosOfStlMeasure].avg)
+//        );
 }
 
-void PrintTotalTime(std::pair<int, Values> pair, double stlAvg)
-{
-    switch (pair.first)
-    {
-        case Logger::PosOfStlMeasure: std::cout << "STL impl" << "           ";
-            break;
-        default:
-            std::cout << pair.first << " threads impl" << "     ";
+//void PrintTotalTime(std::pair<int, Values> pair, double stlAvg)
+//{
+//    switch (pair.first)
+//    {
+//        case Logger::PosOfStlMeasure: std::cout << "STL impl" << "           ";
+//            break;
+//        default:
+//            std::cout << pair.first << " threads impl" << "     ";
 
-    }
+//    }
 
-    std::cout << std::fixed << std::setprecision(3);
-    std::cout << pair.second.min << "s     " << pair.second.max << "s     "
-              << pair.second.avg << "s ";
+//    std::cout << std::fixed << std::setprecision(3);
+//    std::cout << pair.second.min << "s     " << pair.second.max << "s     "
+//              << pair.second.avg << "s ";
 
-    if (!pair.first) std::cout << "STL" << std::endl;
-    else if (pair.second.avg > stlAvg && stlAvg)
-    {
-        std::cout << "-" <<
-            static_cast<int> ((pair.second.avg - stlAvg) / stlAvg * 100)
-            << "%" << std::endl;
-    }
-    else if (pair.second.avg <= stlAvg && stlAvg)
-    {
-        std::cout << "+" <<
-            static_cast<int> ((stlAvg - pair.second.avg) / pair.second.avg * 100)
-            << "%" << std::endl;
-    }
-}
+//    if (!pair.first) std::cout << "STL" << std::endl;
+//    else if (pair.second.avg > stlAvg && stlAvg)
+//    {
+//        std::cout << "-" <<
+//            static_cast<int> ((pair.second.avg - stlAvg) / stlAvg * 100)
+//            << "%" << std::endl;
+//    }
+//    else if (pair.second.avg <= stlAvg && stlAvg)
+//    {
+//        std::cout << "+" <<
+//            static_cast<int> ((stlAvg - pair.second.avg) / pair.second.avg * 100)
+//            << "%" << std::endl;
+//    }
+//}

@@ -59,6 +59,8 @@ int main(int argc, char* argv[])
     SingleThreadSortTest<CSort<int> > csortTest(params);
     csortTest.runTest(logger);
 
+    std::cout << "Table:" << std::endl;
+    logger.PrintTimeTable();
 
 
 
