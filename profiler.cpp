@@ -110,7 +110,6 @@ Logger::Logger()
     : m_sortName("default sort name")
     , m_elementsCount(0)
     , m_threadsCount(0)
-    , m_iterationIndex(0)
 {
 }
 
@@ -154,16 +153,6 @@ void Logger::setElementsCount(const size_t& elementsCount)
     m_elementsCount = elementsCount;
 }
 
-size_t Logger::iteartionIndex() const
-{
-    return m_iterationIndex;
-}
-
-void Logger::setIteartionIndex(size_t iteartionIndex)
-{
-    m_iterationIndex = iteartionIndex;
-}
-
 size_t Logger::threadCount() const
 {
     return m_threadsCount;
@@ -181,9 +170,7 @@ void Logger::setThreadCount(size_t threadCount)
 
 void Logger::SaveTime(double executionTime)
 {
-//    measureMap[m_threadCount].push_back(time);
-    m_logMap[m_sortName][m_elementsCount][m_threadsCount].push_back(
-        { m_iterationIndex, executionTime });
+    m_logMap[m_sortName][m_elementsCount][m_threadsCount].push_back(executionTime);
 }
 
 //void Logger::PrintTableHead(int vecSize, int loopCount)
@@ -196,15 +183,33 @@ void Logger::SaveTime(double executionTime)
 
 void Logger::PrintTimeTable()
 {
-    // TODO: change data structure for supporting new log format;
-//    PrintTableHead();
-//    CalcValues();
+    std::map<ElementsCount, std::map<ThreadsCount,
+            std::pair<SortName, ExecutionTime> > > mapForPrint;
 
-//    std::cout << std::endl << "Impl type" << "          "
-//            << "Min        Max        Avg" << std::endl << std::endl;
-//    std::for_each(m_mapRes.begin(), m_mapRes.end(),
-//        std::bind2nd((std::ptr_fun(PrintTotalTime)), m_mapRes[PosOfStlMeasure].avg)
-//        );
+    for (auto nameIter = m_logMap.begin(); nameIter != m_logMap.end(); ++nameIter)
+    {
+        for (auto elementsCountIter = nameIter->second.begin();
+             elementsCountIter != nameIter->second.end(); ++elementsCountIter)
+        {
+            for (auto threadsCountIter = elementsCountIter->second.begin();
+                 threadsCountIter != elementsCountIter->second.end();
+                 ++threadsCountIter)
+            {
+                mapForPrint[elementsCountIter->first][threadsCountIter->first]
+                    = std::make_pair(nameIter->first, threadsCountIter->second);
+            }
+        }
+    }
+
+    // TODO: change data structure for supporting new log format;
+    //    PrintTableHead();
+    //    CalcValues();
+
+    //    std::cout << std::endl << "Impl type" << "          "
+    //            << "Min        Max        Avg" << std::endl << std::endl;
+    //    std::for_each(m_mapRes.begin(), m_mapRes.end(),
+    //        std::bind2nd((std::ptr_fun(PrintTotalTime)), m_mapRes[PosOfStlMeasure].avg)
+    //        );
 }
 
 //void PrintTotalTime(std::pair<int, Values> pair, double stlAvg)

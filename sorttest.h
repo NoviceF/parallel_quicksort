@@ -84,7 +84,6 @@ private:
 
         for (size_t i = 0; i < m_testParams.loopCount; ++i)
         {
-            logger.setIteartionIndex(i);
             sort.makeSort();
         }
     }

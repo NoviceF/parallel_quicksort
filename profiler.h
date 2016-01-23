@@ -48,9 +48,6 @@ public:
     size_t threadCount() const;
     void setThreadCount(size_t threadCount);
 
-    size_t iteartionIndex() const;
-    void setIteartionIndex(size_t iteartionIndex);
-
 private:
     //анализирует результаты всех проведённых тестов,
     //сохранённые в map, расчитывает мин, макс и среднее время
@@ -60,13 +57,6 @@ private:
     Logger& operator=(const Logger& rhs); //присваивание запрещено
 
 private:
-
-    struct LogValue
-    {
-        size_t iterationIndex;
-        double runningTime;
-    };
-
     // MAP sort name ->
     //      MAP count of elements ->
     //          PAIR threads count -> [iteration index, time diff] ENDPAIR
@@ -74,16 +64,15 @@ private:
     // ENDMAP
 
     typedef std::string SortName;
-    typedef std::vector<LogValue> LogValueCollection;
     typedef size_t ThreadsCount;
     typedef size_t ElementsCount;
+    typedef std::vector<double> ExecutionTime;
 
     std::map<SortName, std::map<ElementsCount,
-            std::map<ThreadsCount, LogValueCollection > > > m_logMap;
+            std::map<ThreadsCount, ExecutionTime > > > m_logMap;
 
     std::string m_sortName;
     size_t m_elementsCount;
     size_t m_threadsCount;
-    size_t m_iterationIndex;
 };
 #endif  /* PROFILER_H */
