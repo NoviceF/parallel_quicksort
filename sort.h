@@ -6,10 +6,8 @@
 #include <stdexcept>
 #include <vector>
 
+#include "logger.h"
 #include "profiler.h"
-
-// TODO remove
-#include <type_traits>
 
 class ISort
 {
@@ -118,6 +116,8 @@ template <typename T>
 class CSort : public SingleThreadSort<T>
 {
 public:
+    static const std::string Name;
+
     CSort(std::vector<T>& vecToSort, Logger& logger)
         : SingleThreadSort<T>(vecToSort, logger)
     {}
@@ -142,9 +142,12 @@ public:
 
     std::string name() const override
     {
-        return "CSort";
+        return CSort::Name;
     }
 };
+
+template <typename T>
+const std::string CSort<T>::Name = "CSort";
 
 template <typename T>
 class STLSort : public SingleThreadSort<T>

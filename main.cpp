@@ -56,12 +56,12 @@ int main(int argc, char* argv[])
     const ParsedParams params(promptParser.getParams());
     Logger logger;
 
-    SingleThreadSortTest<CSort<int> > csortTest(params);
+    typedef CSort<int> csortInt;
+    SingleThreadSortTest<csortInt> csortTest(params);
     csortTest.runTest(logger);
 
     std::cout << "Table:" << std::endl;
-    logger.PrintTimeTable();
-
+    logger.PrintTimeTable(csortInt::Name);
 
 
 

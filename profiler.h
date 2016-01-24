@@ -1,10 +1,7 @@
 #ifndef PROFILER_H
 #define PROFILER_H
 
-#include <iostream>
 #include <boost/date_time/posix_time/posix_time.hpp>
-
-///////////profiler
 
 class Prof
 {
@@ -26,53 +23,4 @@ private:
     Prof& operator=(const Prof& rhs); //присваивание запрещено
 };
 
-///////////logger
-
-class Logger
-{
-public:
-    static const int PosOfStlMeasure = 0;
-
-    Logger();
-    void SaveTime(double executionTime);
-//    void PrintTableHead(int vecSize, int loopCount = 1);
-    void PrintTimeTable();
-    void Reset();
-
-    std::string sortName() const;
-    void setSortName(const std::string& sortName);
-
-    size_t elementsCount() const;
-    void setElementsCount(const size_t& elementsCount);
-
-    size_t threadCount() const;
-    void setThreadCount(size_t threadCount);
-
-private:
-    //анализирует результаты всех проведённых тестов,
-    //сохранённые в map, расчитывает мин, макс и среднее время
-    void CalcValues();
-
-    Logger(const Logger& rhs); //копирование запрещено
-    Logger& operator=(const Logger& rhs); //присваивание запрещено
-
-private:
-    // MAP sort name ->
-    //      MAP count of elements ->
-    //          PAIR threads count -> [iteration index, time diff] ENDPAIR
-    //      ENDMAP
-    // ENDMAP
-
-    typedef std::string SortName;
-    typedef size_t ThreadsCount;
-    typedef size_t ElementsCount;
-    typedef std::vector<double> ExecutionTime;
-
-    std::map<SortName, std::map<ElementsCount,
-            std::map<ThreadsCount, ExecutionTime > > > m_logMap;
-
-    std::string m_sortName;
-    size_t m_elementsCount;
-    size_t m_threadsCount;
-};
 #endif  /* PROFILER_H */
