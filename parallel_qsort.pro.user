@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 3.4.2, 2016-01-24T17:49:17. -->
+<!-- Written by QtCreator 3.4.2, 2016-01-26T00:28:40. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -201,7 +201,7 @@
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">parallel_qsort</value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName"></value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:/home/novice/git/cpp/parallel_qsort/parallel_qsort/parallel_qsort.pro</value>
-    <value type="QString" key="Qt4ProjectManager.Qt4RunConfiguration.CommandLineArguments">--param_string &quot;10 11 1 5 0 0&quot;</value>
+    <value type="QString" key="Qt4ProjectManager.Qt4RunConfiguration.CommandLineArguments">--param_string &quot;50000 100000 25000 5 0 0&quot;</value>
     <value type="QString" key="Qt4ProjectManager.Qt4RunConfiguration.ProFile">parallel_qsort.pro</value>
     <value type="bool" key="Qt4ProjectManager.Qt4RunConfiguration.UseDyldImageSuffix">false</value>
     <value type="bool" key="Qt4ProjectManager.Qt4RunConfiguration.UseTerminal">true</value>

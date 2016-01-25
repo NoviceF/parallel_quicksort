@@ -17,9 +17,7 @@ double Prof::StopAndGetDifference()
     if (t1_ < t2_)
     {
         boost::posix_time::time_duration td(t2_ - t1_);
-        double temp(td.total_milliseconds());
-
-        return temp / 1000;
+        return  td.total_milliseconds();
     }
     else
     {

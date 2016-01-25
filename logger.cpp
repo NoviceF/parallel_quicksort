@@ -70,38 +70,41 @@ void PrintTotalTime(std::map<Logger::SortName,  std::map<Logger::ThreadsCount,
             std::cout << nameIter->first << "    "
                       << (threadsCountIter->first ? threadsCountIter->first : 1)
                       << (threadsCountIter->first == 1
-                         ? " threads impl"
-                         : " thread  impl")
+                         ? " thr "
+                         : " thrs")
                        << "     ";
 
             const MinMaxAvg& minMaxAvg = threadsCountIter->second.minMaxAvg;
 
             std::cout << std::fixed << std::setprecision(3);
-            std::cout << minMaxAvg.min << "s     "
-                      << minMaxAvg.max << "s     "
-                      << minMaxAvg.avg << "s     "
+            std::cout << minMaxAvg.min / 1000 << "s     "
+                      << minMaxAvg.max / 1000 << "s     "
+                      << minMaxAvg.avg / 1000 << "s     "
                       << threadsCountIter->second.iterationCount
-                      << " iterations.";
+                      << " iters    ";
 
-            std::cout << std::endl;
+            const int currentAvg = minMaxAvg.avg;
+            const int pivotAvg = resultsMap[pivotSortName]
+                [threadsCountIter->first].minMaxAvg.avg;
+
+            assert(pivotAvg);
+
+            if (currentAvg > pivotAvg)
+            {
+                std::cout << "-"
+                    << static_cast<double> ((currentAvg - pivotAvg)
+                                         / pivotAvg * 100) / 1000
+                    << "%" << std::endl;
+            }
+            else if (currentAvg <= pivotAvg)
+            {
+                std::cout << "+" <<
+                    static_cast<double> ((pivotAvg - currentAvg)
+                                      / pivotAvg * 100) / 1000
+                    << "%" << std::endl;
+            }
         }
     }
-
-
-
-//    if (!pair.first) std::cout << "STL" << std::endl;
-//    else if (pair.second.avg > stlAvg && stlAvg)
-//    {
-//        std::cout << "-" <<
-//            static_cast<int> ((pair.second.avg - stlAvg) / stlAvg * 100)
-//            << "%" << std::endl;
-//    }
-//    else if (pair.second.avg <= stlAvg && stlAvg)
-//    {
-//        std::cout << "+" <<
-//            static_cast<int> ((stlAvg - pair.second.avg) / pair.second.avg * 100)
-//            << "%" << std::endl;
-//    }
 }
 
 } // namespace
