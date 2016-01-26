@@ -1,0 +1,48 @@
+#include "sortsettings.h"
+
+
+SingleThreadSortSettings::SingleThreadSortSettings()
+    : m_repeatCount(0)
+    , m_vectorSizeIncrement(0)
+{
+}
+
+SingleThreadSortSettings::~SingleThreadSortSettings()
+{
+}
+size_t SingleThreadSortSettings::repeatCount() const
+{
+    return m_repeatCount;
+}
+
+void SingleThreadSortSettings::setRepeatCount(const size_t& repeatCount)
+{
+    m_repeatCount = repeatCount;
+}
+size_t SingleThreadSortSettings::vectorSizeIncrement() const
+{
+    return m_vectorSizeIncrement;
+}
+
+void SingleThreadSortSettings::setVectorSizeIncrement(const size_t& vectorSizeIncrement)
+{
+    m_vectorSizeIncrement = vectorSizeIncrement;
+}
+
+
+MultithreadSortSettings::MultithreadSortSettings()
+{
+
+}
+size_t MultithreadSortSettings::threadsCount() const
+{
+    return m_threadsCount;
+}
+
+void MultithreadSortSettings::setThreadsCount(const size_t& threadsCount)
+{
+    m_threadsCount = threadsCount;
+}
+
+
+

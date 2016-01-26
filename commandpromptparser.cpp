@@ -2,7 +2,7 @@
 #include <iostream>
 #include <iterator>
 
-#include <boost/program_options.hpp>
+#include <program_options.hpp>
 
 #include "commandpromptparser.h"
 

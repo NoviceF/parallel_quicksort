@@ -32,5 +32,6 @@ HEADERS += \
     logger.h
 
 #LIBS += -L/usr/lib -llibboost_program_options
+INCLUDEPATH += $$PWD/deps/include
 
-unix:!macx: LIBS += -lboost_program_options -lpthread
+unix:!macx: LIBS += -Ldeps/lib -lboost_program_options -lpthread
