@@ -153,23 +153,29 @@ template <typename T>
 class STLSort : public SingleThreadSort<T>
 {
 public:
-    STLSort(std::vector<T>& vecToSort)
-        : SortBase<T>(vecToSort)
+    static const std::string Name;
+
+    STLSort(std::vector<T>& vecToSort, Logger& logger)
+        : SingleThreadSort<T>(vecToSort, logger)
     {}
 
     void doSort() override
     {
         std::sort(
             SortBase<T>::m_vecToSort.begin(),
-            SortBase<T>::m_vecToSorc.end(),
-            [&](const typename std::vector<T>::iterator& first,
-                const typename std::vector<T>::iterator& second)
-            {
-                return *first < *second;
-            }
+            SortBase<T>::m_vecToSort.end()
         );
     }
+
+    std::string name() const override
+    {
+        return STLSort::Name;
+    }
 };
+
+template <typename T>
+const std::string STLSort<T>::Name = "STLSort";
+
 
 template <typename T>
 class PosixParallelSort : public MultiThreadSort<T>

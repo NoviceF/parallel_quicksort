@@ -60,6 +60,10 @@ int main(int argc, char* argv[])
     SingleThreadSortTest<csortInt> csortTest(params);
     csortTest.runTest(logger);
 
+    typedef STLSort<int> stlSortInt;
+    SingleThreadSortTest<stlSortInt> stlSortTest(params);
+    stlSortTest.runTest(logger);
+
     std::cout << "Table:" << std::endl;
     logger.PrintTimeTable(csortInt::Name);
 
