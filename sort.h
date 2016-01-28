@@ -147,7 +147,7 @@ public:
 };
 
 template <typename T>
-const std::string CSort<T>::Name = "CSort";
+const std::string CSort<T>::Name = "C";
 
 template <typename T>
 class STLSort : public SingleThreadSort<T>
@@ -174,7 +174,7 @@ public:
 };
 
 template <typename T>
-const std::string STLSort<T>::Name = "STLSort";
+const std::string STLSort<T>::Name = "STL";
 
 
 template <typename T>

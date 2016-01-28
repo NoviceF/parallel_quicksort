@@ -41,7 +41,7 @@ MinMaxAvg GetMinMaxAvg(std::vector<double> vec)
 }
 
 
-void PrintLine(int lengh = 54)
+void PrintLine(int lengh = 71)
 {
     for (int i = 0; i < lengh; ++i)
     {
@@ -51,10 +51,19 @@ void PrintLine(int lengh = 54)
     std::cout << std::endl;
 }
 
+void PrintSpaces(size_t count)
+{
+    for (size_t i = 0; i < count; ++i)
+    {
+        std::cout << " ";
+    }
+}
+
 void PrintTableHead(int vecSize)
 {
     PrintLine();
-    std::cout << "                  " << "vector size = " << vecSize << std::endl;
+    PrintSpaces(26);
+    std::cout << "vector size = " << vecSize << std::endl;
     PrintLine();
 }
 
@@ -67,7 +76,16 @@ void PrintTotalTime(std::map<Logger::SortName,  std::map<Logger::ThreadsCount,
         for (auto threadsCountIter = nameIter->second.begin();
              threadsCountIter != nameIter->second.end(); ++threadsCountIter)
         {
-            std::cout << nameIter->first << "    "
+            std::cout << nameIter->first;
+
+            const size_t lengthForName = 5;
+
+            if (nameIter->first.size() < lengthForName)
+            {
+                PrintSpaces(lengthForName - nameIter->first.size());
+            }
+
+            std::cout <<  "    "
                       << (threadsCountIter->first ? threadsCountIter->first : 1)
                       << (threadsCountIter->first == 1
                          ? " thr "
@@ -83,8 +101,8 @@ void PrintTotalTime(std::map<Logger::SortName,  std::map<Logger::ThreadsCount,
                       << threadsCountIter->second.iterationCount
                       << " iters    ";
 
-            const int currentAvg = minMaxAvg.avg;
-            const int pivotAvg = resultsMap[pivotSortName]
+            const double currentAvg = minMaxAvg.avg;
+            const double pivotAvg = resultsMap[pivotSortName]
                 [threadsCountIter->first].minMaxAvg.avg;
 
             assert(pivotAvg);
@@ -105,6 +123,8 @@ void PrintTotalTime(std::map<Logger::SortName,  std::map<Logger::ThreadsCount,
             }
         }
     }
+
+    std::cout << std::endl;
 }
 
 } // namespace
