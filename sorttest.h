@@ -54,10 +54,6 @@ public:
     {
     }
 
-    ~SingleThreadSortTest() override
-    {
-    }
-
     void runTest(Logger& logger) override
     {
         size_t vecSize = m_testParams.firstVecSize;
@@ -90,6 +86,28 @@ private:
 
 protected:
     const ParsedParams& m_testParams;
+};
+
+template <class T>
+class MultiThreadSortTest : public SingleThreadSortTest<T>
+{
+public:
+    MultiThreadSortTest(const ParsedParams& testParams)
+        : SingleThreadSortTest<T>(testParams)
+    {
+    }
+
+private:
+    virtual void loopCore(std::vector<int>& vecToSort, Logger& logger)
+    {
+        T sort(vecToSort, logger);
+        sort.setThreadsCount(MultiThreadSortTest<T>::m_testParams.threadsCount);
+
+        for (size_t i = 0; i < MultiThreadSortTest<T>::m_testParams.loopCount; ++i)
+        {
+            sort.makeSort();
+        }
+    }
 };
 
 #endif // SORTTEST_H

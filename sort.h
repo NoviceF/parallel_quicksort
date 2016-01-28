@@ -43,7 +43,7 @@ public:
         doPostSort();
     }
 
-private:
+protected:
     virtual void doPreSort()
     {
         m_logger.setSortName(name());
@@ -80,11 +80,11 @@ template <typename T>
 class MultiThreadSort : public SortBase<T>
 {
 public:
-    MultiThreadSort()
-        : m_threadsCount(0)
+    MultiThreadSort(std::vector<T>& vecToSort, Logger& logger)
+        : SortBase<T>(vecToSort, logger)
+        , m_threadsCount(0)
     {
     }
-    ~MultiThreadSort();
 
     int threadsCount() const
     {
@@ -181,12 +181,26 @@ template <typename T>
 class PosixParallelSort : public MultiThreadSort<T>
 {
 public:
-    PosixParallelSort(std::vector<T>& vecToSort)
-        : SortBase<T>(vecToSort)
+    static const std::string Name;
+
+    PosixParallelSort(std::vector<T>& vecToSort, Logger& logger)
+        : MultiThreadSort<T>(vecToSort, logger)
     {}
 
-    void doSort() override;
+    void doSort() override
+    {
+        SortBase<T>::m_vecToSort.begin();
+        SortBase<T>::m_vecToSort.end();
+    }
+
+    std::string name() const override
+    {
+        return PosixParallelSort::Name;
+    }
 };
+
+template <typename T>
+const std::string PosixParallelSort<T>::Name = "Posix";
 
 template <typename T>
 class Cpp11ParallelSort : public MultiThreadSort<T>

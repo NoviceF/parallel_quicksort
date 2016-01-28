@@ -50,8 +50,6 @@
 
 int main(int argc, char* argv[])
 {
-//    VectorSaver vecSaver;
-
     CommandPromptParser promptParser(argc, argv);
     const ParsedParams params(promptParser.getParams());
     Logger logger;
@@ -60,11 +58,16 @@ int main(int argc, char* argv[])
     SingleThreadSortTest<csortInt> csortTest(params);
     csortTest.runTest(logger);
 
-    typedef STLSort<int> stlSortInt;
-    SingleThreadSortTest<stlSortInt> stlSortTest(params);
-    stlSortTest.runTest(logger);
+//    typedef STLSort<int> stlSortInt;
+//    SingleThreadSortTest<stlSortInt> stlSortTest(params);
+//    stlSortTest.runTest(logger);
 
-    std::cout << "Table:" << std::endl;
+    typedef PosixParallelSort<int> posixSortInt;
+    MultiThreadSortTest<posixSortInt> posixSortTest(params);
+    posixSortTest.runTest(logger);
+
+
+
     logger.PrintTimeTable(csortInt::Name);
 
 
