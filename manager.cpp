@@ -2,21 +2,24 @@
 #include "sortimpl.h"
 #include "profiler.h"
 
-pthread_mutex_t Manager::mutexQue_ = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t Manager::mutexQue = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t Manager::cond = PTHREAD_COND_INITIALIZER;
 
-Manager::Manager(int threadsTotal) : waitOnCond_(0), jobEnd_(0),
-threadsTotal_(threadsTotal) { }
+Manager::Manager(std::vector<int>& sourceVec, int threadsTotal)
+    : vec_(sourceVec)
+    , waitOnCond_(0)
+    , jobEnd_(0)
+    , threadsTotal_(threadsTotal) { }
 
 void Manager::addWork(int vecSize)
 {
     int vecStart = 0;
-    pthread_mutex_lock(&mutexQue_);
+    pthread_mutex_lock(&mutexQue);
     jobEnd_ = false;
 
-    globalDeq.push(Coords{vecStart, vecSize - 1, 0});
+    globalDeq_.push(Coords{vecStart, vecSize - 1, 0});
 
-    pthread_mutex_unlock(&mutexQue_);
+    pthread_mutex_unlock(&mutexQue);
 }
 
 void * f(void * arg)
@@ -27,37 +30,37 @@ void * f(void * arg)
 
     while (true)
     {
-        if (mn.globalDeq.empty() && localDeq.empty()) ///////// waiting cond
+        if (mn.globalDeq().empty() && localDeq.empty()) ///////// waiting cond
         {
-            Lock mLock(mn.mutexQue_);
+            Lock mLock(mn.mutexQue);
 
-            while (mn.globalDeq.empty() && !mn.isOtherTreadsWait())
+            while (mn.globalDeq().empty() && !mn.isOtherTreadsWait())
             {
-                ++mn.waitOnCond_;
-                pthread_cond_wait(&mn.cond, &mn.mutexQue_);
+                ++mn.waitOnCond();
+                pthread_cond_wait(&mn.cond, &mn.mutexQue);
 
-                if (mn.jobEnd_)
+                if (mn.jobEnd())
                 {
                     mn.exitThread();
                 }
 
-                --mn.waitOnCond_;
+                --mn.waitOnCond();
             }
 
             //////// exit cond
-            if (mn.globalDeq.empty() && localDeq.empty() && mn.isOtherTreadsWait())
+            if (mn.globalDeq().empty() && localDeq.empty() && mn.isOtherTreadsWait())
                 mn.exitThread();
         }
 
         ////sorting from localdeq
-        if (localDeq.empty() && !mn.globalDeq.empty()) ////// localdeq is empty
+        if (localDeq.empty() && !mn.globalDeq().empty()) ////// localdeq is empty
         {
-            Lock mLock(mn.mutexQue_);
+            Lock mLock(mn.mutexQue);
 
-            if (!mn.globalDeq.empty())
+            if (!mn.globalDeq().empty())
             {
-                localDeq.push(mn.globalDeq.top());
-                mn.globalDeq.pop();
+                localDeq.push(mn.globalDeq().top());
+                mn.globalDeq().pop();
             }
         }
 
@@ -66,7 +69,7 @@ void * f(void * arg)
             Coords cd1 = localDeq.top();
             localDeq.pop();
 
-            quicksort(mn.vec, &cd1.start, &cd1.end, &cd1.pivot);
+            quicksort(mn.vec(), &cd1.start, &cd1.end, &cd1.pivot);
 
             if (cd1.start < cd1.pivot - 1) localDeq.push(
                     Coords{cd1.start, cd1.pivot - 1, cd1.pivot}
@@ -76,22 +79,22 @@ void * f(void * arg)
                     Coords{cd1.pivot + 1, cd1.end, cd1.pivot}
             );
 
-            if (mn.globalDeq.empty() && localDeq.size() > 1)//!!!!!!!!!!!
+            if (mn.globalDeq().empty() && localDeq.size() > 1)//!!!!!!!!!!!
             {
                 break;
             }
         }
 
         //////////////// globalDeq is empty
-        if (mn.globalDeq.empty() && localDeq.size() > 1)//!!!!!!!!!!!!
+        if (mn.globalDeq().empty() && localDeq.size() > 1)//!!!!!!!!!!!!
         {
-            Lock mLock(mn.mutexQue_);
+            Lock mLock(mn.mutexQue);
 
-            if (mn.globalDeq.empty())
+            if (mn.globalDeq().empty())
             {
-                mn.globalDeq.push(localDeq.top());
+                mn.globalDeq().push(localDeq.top());
                 localDeq.pop();
-                if (mn.waitOnCond_)
+                if (mn.waitOnCond())
                 {
                     pthread_cond_signal(&mn.cond);
                 }
@@ -124,16 +127,32 @@ void Manager::exitThread()
     jobIsDone();
 
     pthread_cond_signal(&cond);
-    pthread_mutex_unlock(&mutexQue_);
+    pthread_mutex_unlock(&mutexQue);
     pthread_exit(NULL);
 }
 
 void Manager::reset(int threadCount)
 {
-    vec.clear();
+    vec_.clear();
 
     jobEnd_ = false;
     threadsTotal_ = threadCount;
+}
+std::stack<Coords>& Manager::globalDeq()
+{
+    return globalDeq_;
+}
+volatile int& Manager::waitOnCond()
+{
+    return waitOnCond_;
+}
+volatile bool& Manager::jobEnd()
+{
+    return jobEnd_;
+}
+std::vector<int>& Manager::vec()
+{
+    return vec_;
 }
 
 void Manager::initVec(int vecSize)
@@ -142,7 +161,7 @@ void Manager::initVec(int vecSize)
 
     for (int i = 0; i < vecSize; ++i)
     {
-        vec.push_back(rand() % vecSize);
+        vec_.push_back(rand() % vecSize);
     }
 }
 
@@ -150,14 +169,14 @@ void Manager::initVecHalf(int vecSize)
 {
     for (int i = 0; i < vecSize / 2; ++i)
     {
-        vec.push_back(i);
+        vec_.push_back(i);
     }
 
     srand(time(NULL));
 
     for (int i = vecSize / 2 + 1; i < vecSize; ++i)
     {
-        vec.push_back(rand() % 100);
+        vec_.push_back(rand() % 100);
     }
 }
 
@@ -165,7 +184,7 @@ void Manager::printVec(int vecSize)
 {
     for (int i = 0; i < vecSize; ++i)
     {
-        std::cout << vec[i] << " ";
+        std::cout << vec_[i] << " ";
     }
 
     std::cout << std::endl;

@@ -105,7 +105,7 @@ void PrintTotalTime(std::map<Logger::SortName,  std::map<Logger::ThreadsCount,
             const double pivotAvg = resultsMap[pivotSortName]
                 [threadsCountIter->first].minMaxAvg.avg;
 
-            assert(pivotAvg);
+//            assert(pivotAvg);
 
             if (currentAvg > pivotAvg)
             {

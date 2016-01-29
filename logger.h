@@ -47,4 +47,24 @@ private:
     size_t m_threadsCount;
 };
 
+
+//    void VectorSaver::SaveResToFile(std::vector<int>& vec, int thrCount, int mesNum)
+//    {
+//        std::string str1("./test/");
+//        mkdir(str1.c_str(), 0777);
+//        str1.append("_thrCount");
+//        str1.append(::lexical_cast<std::string, int>(thrCount));
+//        str1.append("_mesNum");
+//        str1.append(::lexical_cast<std::string, int>(mesNum));
+//        std::ofstream output(str1, std::ios::binary);
+
+//        if (output.is_open())
+//        {
+//            std::copy(vec.begin(), vec.end(),
+//                      std::ostream_iterator<int>(output, "\n"));
+//            output.close();
+//        }
+//    }
+
+
 #endif // LOGGER_H

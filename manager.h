@@ -26,7 +26,7 @@ public:
     // конструктор принимает значение threadsTotal,
     // которое обозначает количество потоков, с которым будет работать класс
     //  0 - STL, положительные инт - количество потоков
-    Manager(int threadsTotal);
+    Manager(std::vector<int>& sourceVec, int threadsTotal);
     // метод принимает длину сортируемого вектора
     // и вносит индексы (начало 0 и конец vecSize) в очередь для обработки
     void addWork(int vecSize);
@@ -50,11 +50,25 @@ public:
     // по-умолчанию, принимает количество потоков, с которомы потребуется работать
     void reset(int threadCount);
 
-    std::vector<int> vec; // содержит сортируемый вектор int
-    std::vector<std::string> vecStr; // используется при работе с текстовым файлами
+    std::vector<int>& vec();
+
+    std::stack<Coords>& globalDeq();
+
+    volatile int& waitOnCond();
+
+    volatile bool& jobEnd();
+
+    static pthread_mutex_t mutexQue; // мьютекс, синхронизирующий доступ к очереди
+    // переменная условия, на которой ожидают потоки,
+    // в случае, если очередь пуста
+    static pthread_cond_t cond;
+
+private:
+    std::vector<int>& vec_; // содержит сортируемый вектор int
+    std::vector<std::string> vecStr_; // используется при работе с текстовым файлами
     // очередь, в которой сохраняются индексы участков
     // вектора, требующих сортировки
-    std::stack<Coords> globalDeq;
+    std::stack<Coords> globalDeq_;
 
     // количество потоков локальная очередь которых
     // исчерпана, ожидающих появления "работы" в глобальной очереди
@@ -63,11 +77,6 @@ public:
     // выставляется потоком, завершающим работу последним
     volatile bool jobEnd_;
     int threadsTotal_; // общее количество потоков, с которыми должен работать класс
-
-    static pthread_mutex_t mutexQue_; // мьютекс, синхронизирующий доступ к очереди
-    // переменная условия, на которой ожидают потоки,
-    // в случае, если очередь пуста
-    static pthread_cond_t cond;
 
 private:
     Manager(const Manager& rhs); // копирование объектов запрещено
