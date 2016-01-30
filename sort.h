@@ -106,6 +106,8 @@ private:
                         "MultiThreadSort::doPreSort: need to set threads count!");
         }
 
+        SortBase<T>::m_logger.setThreadCount(m_threadsCount);
+
         SortBase<T>::doPreSort();
     }
 
@@ -190,9 +192,14 @@ public:
 
     void doSort() override
     {
+        const size_t vecSize = SortBase<T>::m_vecToSort.size();
+
+        if (vecSize < 2)
+            return;
+
         const size_t threadsCount = MultiThreadSort<T>::threadsCount();
         Manager manager(SortBase<T>::m_vecToSort, threadsCount);
-        manager.addWork(SortBase<T>::m_vecToSort.size());
+        manager.addWork(vecSize);
 
         std::vector<pthread_t> threads(threadsCount);
         std::vector<SortingTask> tasks(threadsCount);

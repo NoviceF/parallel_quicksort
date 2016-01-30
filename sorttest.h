@@ -66,7 +66,14 @@ public:
                     ? fillVectorFullRandom(vecToSort, vecSize)
                     : fillVectorHalfRandom(vecToSort, vecSize);
 
-            loopCore(vecToSort, logger);
+            T sort(vecToSort, logger);
+            setupSort(sort);
+
+            for (size_t i = 0; i < m_testParams.loopCount; ++i)
+            {
+                std::random_shuffle(vecToSort.begin(), vecToSort.end());
+                sort.makeSort();
+            }
 
             vecSize += m_testParams.incStep;
         }
@@ -74,14 +81,8 @@ public:
     }
 
 private:
-    virtual void loopCore(std::vector<int>& vecToSort, Logger& logger)
+    virtual void setupSort(T&)
     {
-        T sort(vecToSort, logger);
-
-        for (size_t i = 0; i < m_testParams.loopCount; ++i)
-        {
-            sort.makeSort();
-        }
     }
 
 protected:
@@ -98,15 +99,9 @@ public:
     }
 
 private:
-    virtual void loopCore(std::vector<int>& vecToSort, Logger& logger)
+    void setupSort(T& sort) override
     {
-        T sort(vecToSort, logger);
         sort.setThreadsCount(MultiThreadSortTest<T>::m_testParams.threadsCount);
-
-        for (size_t i = 0; i < MultiThreadSortTest<T>::m_testParams.loopCount; ++i)
-        {
-            sort.makeSort();
-        }
     }
 };
 

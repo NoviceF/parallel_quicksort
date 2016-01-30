@@ -20,7 +20,7 @@ struct SortResult
     MinMaxAvg minMaxAvg;
 };
 
-MinMaxAvg GetMinMaxAvg(std::vector<double> vec)
+MinMaxAvg GetMinMaxAvg(const std::vector<double>& vec)
 {
     assert(!vec.empty());
 
@@ -28,14 +28,13 @@ MinMaxAvg GetMinMaxAvg(std::vector<double> vec)
     double maxValue = vec[0];
     double avgValue = vec[0];
 
-    for (int i = 0; i < static_cast<int> (vec.size()); ++i)
+    for (size_t i = 0; i < vec.size(); ++i)
     {
         if (vec[i] < minValue) minValue = vec[i];
         if (vec[i] > maxValue) maxValue = vec[i];
-        avgValue += vec[i];
     }
 
-    avgValue /= static_cast<int> (vec.size());
+    avgValue = (maxValue + minValue) / 2;
 
     return { minValue, maxValue, avgValue };
 }
