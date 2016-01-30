@@ -69,6 +69,10 @@ void PrintTableHead(int vecSize)
 void PrintTotalTime(std::map<Logger::SortName,  std::map<Logger::ThreadsCount,
         SortResult > > resultsMap, const std::string& pivotSortName)
 {
+    const size_t threadCountForPivot = 0;
+    const double pivotAvg = resultsMap[pivotSortName]
+        [threadCountForPivot].minMaxAvg.avg;
+
     for (auto nameIter = resultsMap.begin(); nameIter != resultsMap.end();
          ++nameIter)
     {
@@ -101,23 +105,20 @@ void PrintTotalTime(std::map<Logger::SortName,  std::map<Logger::ThreadsCount,
                       << " iters    ";
 
             const double currentAvg = minMaxAvg.avg;
-            const double pivotAvg = resultsMap[pivotSortName]
-                [threadsCountIter->first].minMaxAvg.avg;
-
 //            assert(pivotAvg);
 
             if (currentAvg > pivotAvg)
             {
                 std::cout << "-"
                     << static_cast<double> ((currentAvg - pivotAvg)
-                                         / pivotAvg * 100) / 1000
+                                         / pivotAvg * 100)
                     << "%" << std::endl;
             }
             else if (currentAvg <= pivotAvg)
             {
                 std::cout << "+" <<
                     static_cast<double> ((pivotAvg - currentAvg)
-                                      / pivotAvg * 100) / 1000
+                                      / pivotAvg * 100)
                     << "%" << std::endl;
             }
         }
