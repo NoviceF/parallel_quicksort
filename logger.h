@@ -15,9 +15,9 @@ public:
 
 public:
     Logger();
-    void SaveTime(double executionTime);
-    void PrintTimeTable(const std::string& pivotSortName);
-    void Reset();
+    void saveTime(double executionTime);
+    void printTimeTable(const std::string& pivotSortName);
+    void reset();
 
     std::string sortName() const;
     void setSortName(const std::string& sortName);

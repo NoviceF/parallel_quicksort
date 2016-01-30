@@ -17,19 +17,19 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp \
-    manager.cpp \
     profiler.cpp \
     commandpromptparser.cpp \
-    logger.cpp
+    logger.cpp \
+    posixsortmanager.cpp
 
 HEADERS += \
-    manager.h \
     profiler.h \
-    sortimpl.h \
     commandpromptparser.h \
     sort.h \
     sorttest.h \
-    logger.h
+    logger.h \
+    quicksortimpl.h \
+    posixsortmanager.h
 
 #LIBS += -L/usr/lib -llibboost_program_options
 INCLUDEPATH += $$PWD/deps/include

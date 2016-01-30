@@ -8,7 +8,7 @@
 
 #include "logger.h"
 #include "profiler.h"
-#include "manager.h"
+#include "posixsortmanager.h"
 
 class ISort
 {
@@ -55,7 +55,7 @@ protected:
 
     virtual void doPostSort()
     {
-        m_logger.SaveTime(m_profiler.StopAndGetDifference());
+        m_logger.saveTime(m_profiler.StopAndGetDifference());
 
         if (!std::is_sorted(m_vecToSort.begin(), m_vecToSort.end()))
             throw std::runtime_error("SortBase::doPostSort: vec is not sorted!");

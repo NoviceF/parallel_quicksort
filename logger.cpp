@@ -20,7 +20,7 @@ struct SortResult
     MinMaxAvg minMaxAvg;
 };
 
-MinMaxAvg GetMinMaxAvg(const std::vector<double>& vec)
+MinMaxAvg getMinMaxAvg(const std::vector<double>& vec)
 {
     assert(!vec.empty());
 
@@ -40,7 +40,7 @@ MinMaxAvg GetMinMaxAvg(const std::vector<double>& vec)
 }
 
 
-void PrintLine(int lengh = 71)
+void printLine(int lengh = 72)
 {
     for (int i = 0; i < lengh; ++i)
     {
@@ -50,7 +50,7 @@ void PrintLine(int lengh = 71)
     std::cout << std::endl;
 }
 
-void PrintSpaces(size_t count)
+void printSpaces(size_t count)
 {
     for (size_t i = 0; i < count; ++i)
     {
@@ -58,15 +58,56 @@ void PrintSpaces(size_t count)
     }
 }
 
-void PrintTableHead(int vecSize)
+void printTableHead(int vecSize)
 {
-    PrintLine();
-    PrintSpaces(26);
+    printLine();
+    printSpaces(26);
     std::cout << "vector size = " << vecSize << std::endl;
-    PrintLine();
+    printLine();
+    const size_t lengthForName = 5;
+    const size_t fillingSpacesCount = 4;
+
+    const std::string name("Name");
+    std::cout << name;
+
+    printSpaces(lengthForName - name.length() + fillingSpacesCount);
+
+    const std::string threads("Threads");
+    std::cout << threads;
+    const size_t threadsSpacesCount = 6;
+
+    printSpaces(fillingSpacesCount - (threads.length() - threadsSpacesCount));
+
+    const std::string min("Min");
+    std::cout << min;
+
+    const size_t elapsedValueInMsSpaces = 6;
+
+    printSpaces(elapsedValueInMsSpaces - min.length());
+    printSpaces(fillingSpacesCount);
+
+    const std::string max("Max");
+    std::cout << max;
+    printSpaces(elapsedValueInMsSpaces - max.length() + fillingSpacesCount);
+
+    const std::string avg("Avg");
+    std::cout << avg;
+    printSpaces(elapsedValueInMsSpaces - max.length() + fillingSpacesCount);
+
+
+    const std::string iterationCount("IterCount");
+    const size_t iterationCountSpaces = 7;
+    std::cout << iterationCount;
+    printSpaces(fillingSpacesCount - (iterationCount.length() - iterationCountSpaces));
+
+    const std::string differenceInPercent("Difference");
+    std::cout << differenceInPercent;
+
+    std::cout << std::endl;
+    printLine();
 }
 
-void PrintTotalTime(std::map<Logger::SortName,  std::map<Logger::ThreadsCount,
+void printTotalTime(std::map<Logger::SortName,  std::map<Logger::ThreadsCount,
         SortResult > > resultsMap, const std::string& pivotSortName)
 {
     const size_t threadCountForPivot = 0;
@@ -85,7 +126,7 @@ void PrintTotalTime(std::map<Logger::SortName,  std::map<Logger::ThreadsCount,
 
             if (nameIter->first.size() < lengthForName)
             {
-                PrintSpaces(lengthForName - nameIter->first.size());
+                printSpaces(lengthForName - nameIter->first.size());
             }
 
             std::cout <<  "    "
@@ -93,14 +134,14 @@ void PrintTotalTime(std::map<Logger::SortName,  std::map<Logger::ThreadsCount,
                       << (threadsCountIter->first == 1
                          ? " thr "
                          : " thrs")
-                       << "     ";
+                       << "    ";
 
             const MinMaxAvg& minMaxAvg = threadsCountIter->second.minMaxAvg;
 
             std::cout << std::fixed << std::setprecision(3);
-            std::cout << minMaxAvg.min / 1000 << "s     "
-                      << minMaxAvg.max / 1000 << "s     "
-                      << minMaxAvg.avg / 1000 << "s     "
+            std::cout << minMaxAvg.min / 1000 << "s    "
+                      << minMaxAvg.max / 1000 << "s    "
+                      << minMaxAvg.avg / 1000 << "s    "
                       << threadsCountIter->second.iterationCount
                       << " iters    ";
 
@@ -136,7 +177,7 @@ Logger::Logger()
 {
 }
 
-void Logger::Reset()
+void Logger::reset()
 {
 //    measureMap.clear();
 //    m_mapRes.clear();
@@ -177,12 +218,12 @@ void Logger::setThreadCount(size_t threadCount)
 //    return m_map;
 //}
 
-void Logger::SaveTime(double executionTime)
+void Logger::saveTime(double executionTime)
 {
     m_logMap[m_sortName][m_elementsCount][m_threadsCount].push_back(executionTime);
 }
 
-void Logger::PrintTimeTable(const std::string& pivotSortName)
+void Logger::printTimeTable(const std::string& pivotSortName)
 {
 
     std::map<ElementsCount, std::map<SortName, std::map<ThreadsCount,
@@ -200,7 +241,7 @@ void Logger::PrintTimeTable(const std::string& pivotSortName)
                 mapForPrint[elementsCountIter->first][nameIter->first]
                         [threadsCountIter->first] = {
                             threadsCountIter->second.size(),
-                            GetMinMaxAvg(threadsCountIter->second)
+                            getMinMaxAvg(threadsCountIter->second)
                             };
             }
         }
@@ -209,9 +250,9 @@ void Logger::PrintTimeTable(const std::string& pivotSortName)
     for (auto elementsCountIter = mapForPrint.begin();
          elementsCountIter != mapForPrint.end(); ++elementsCountIter)
     {
-        PrintTableHead(elementsCountIter->first);
+        printTableHead(elementsCountIter->first);
 
-        PrintTotalTime(elementsCountIter->second, pivotSortName);
+        printTotalTime(elementsCountIter->second, pivotSortName);
 
 //        for (auto nameIter = elementsCountIter->second.begin();
 //             nameIter != elementsCountIter->second.end(); ++nameIter)

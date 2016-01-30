@@ -13,13 +13,15 @@ int main(int argc, char* argv[])
     const ParsedParams params(promptParser.getParams());
     Logger logger;
 
-    typedef CSort<int> csortInt;
-    SingleThreadSortTest<csortInt> csortTest(params);
-    csortTest.runTest(logger);
-
+//    sleep(1);
+//    typedef CSort<int> csortInt;
+//    SingleThreadSortTest<csortInt> csortTest(params);
+//    csortTest.runTest(logger);
+    sleep(1);
     typedef STLSort<int> stlSortInt;
     SingleThreadSortTest<stlSortInt> stlSortTest(params);
     stlSortTest.runTest(logger);
+    sleep(1);
 
     typedef PosixParallelSort<int> posixSortInt;
     MultiThreadSortTest<posixSortInt> posixSortTest(params);
@@ -27,7 +29,8 @@ int main(int argc, char* argv[])
 
 
 
-    logger.PrintTimeTable(csortInt::Name);
+//    logger.PrintTimeTable(csortInt::Name);
+    logger.printTimeTable(stlSortInt::Name);
 //    logger.PrintTimeTable(posixSortInt::Name);
 
     return 0;

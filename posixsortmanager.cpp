@@ -1,5 +1,5 @@
-#include "manager.h"
-#include "sortimpl.h"
+#include "posixsortmanager.h"
+#include "quicksortimpl.h"
 #include "profiler.h"
 
 pthread_mutex_t Manager::mutexQue = PTHREAD_MUTEX_INITIALIZER;
