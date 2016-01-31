@@ -69,22 +69,17 @@ void printTableHead(int vecSize)
 
     const std::string name("Name");
     std::cout << name;
-
     printSpaces(lengthForName - name.length() + fillingSpacesCount);
 
     const std::string threads("Threads");
     std::cout << threads;
     const size_t threadsSpacesCount = 6;
-
     printSpaces(fillingSpacesCount - (threads.length() - threadsSpacesCount));
 
     const std::string min("Min");
     std::cout << min;
-
     const size_t elapsedValueInMsSpaces = 6;
-
-    printSpaces(elapsedValueInMsSpaces - min.length());
-    printSpaces(fillingSpacesCount);
+    printSpaces(elapsedValueInMsSpaces - min.length() + fillingSpacesCount);
 
     const std::string max("Max");
     std::cout << max;
@@ -94,10 +89,9 @@ void printTableHead(int vecSize)
     std::cout << avg;
     printSpaces(elapsedValueInMsSpaces - max.length() + fillingSpacesCount);
 
-
     const std::string iterationCount("IterCount");
-    const size_t iterationCountSpaces = 7;
     std::cout << iterationCount;
+    const size_t iterationCountSpaces = 7;
     printSpaces(fillingSpacesCount - (iterationCount.length() - iterationCountSpaces));
 
     const std::string differenceInPercent("Difference");

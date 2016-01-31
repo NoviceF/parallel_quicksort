@@ -1,0 +1,11 @@
+#ifndef CPP11PARALLELSORTLOCKFREESTACK_H
+#define CPP11PARALLELSORTLOCKFREESTACK_H
+
+
+class Cpp11ParallelSortLockFreeStack
+{
+public:
+    Cpp11ParallelSortLockFreeStack();
+};
+
+#endif // CPP11PARALLELSORTLOCKFREESTACK_H

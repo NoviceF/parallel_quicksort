@@ -29,7 +29,13 @@ HEADERS += \
     sorttest.h \
     logger.h \
     quicksortimpl.h \
-    posixsortmanager.h
+    posixsortmanager.h \
+    sortbase.h \
+    csort.h \
+    stlsort.h \
+    posixparallelsort.h \
+    cpp11parallelsortasync.h \
+    cpp11parallelsortlockfreestack.h
 
 #LIBS += -L/usr/lib -llibboost_program_options
 INCLUDEPATH += $$PWD/deps/include
