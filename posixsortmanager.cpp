@@ -154,38 +154,3 @@ std::vector<int>& Manager::vec()
 {
     return vec_;
 }
-
-void Manager::initVec(int vecSize)
-{
-    srand(time(NULL));
-
-    for (int i = 0; i < vecSize; ++i)
-    {
-        vec_.push_back(rand() % vecSize);
-    }
-}
-
-void Manager::initVecHalf(int vecSize)
-{
-    for (int i = 0; i < vecSize / 2; ++i)
-    {
-        vec_.push_back(i);
-    }
-
-    srand(time(NULL));
-
-    for (int i = vecSize / 2 + 1; i < vecSize; ++i)
-    {
-        vec_.push_back(rand() % 100);
-    }
-}
-
-void Manager::printVec(int vecSize)
-{
-    for (int i = 0; i < vecSize; ++i)
-    {
-        std::cout << vec_[i] << " ";
-    }
-
-    std::cout << std::endl;
-}

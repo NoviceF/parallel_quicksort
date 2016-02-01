@@ -30,14 +30,6 @@ public:
     // метод принимает длину сортируемого вектора
     // и вносит индексы (начало 0 и конец vecSize) в очередь для обработки
     void addWork(int vecSize);
-    // заполняет вектор случайными значениями
-    void initVec(int vecSize);
-    // заполняет первую половину вектора
-    // от 0 до vecSize/(1/2) последовательными значенями, вторую
-    // половину вектора - случайными
-    void initVecHalf(int vecSize);
-    // печатает элементы вектора от 0 до vecSize
-    void printVec(int vecSize);
 
     bool isJobDone();
     void jobIsDone();

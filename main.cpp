@@ -27,6 +27,13 @@ int main(int argc, char* argv[])
     MultiThreadSortTest<posixSortInt> posixSortTest(params);
     posixSortTest.runTest(logger);
 
+    sleep(1);
+
+    typedef Cpp11ParallelSortAsync<int> asyncSortInt;
+    MultiThreadSortTest<asyncSortInt> asyncSortTest(params);
+    asyncSortTest.runTest(logger);
+
+
 
 
 //    logger.PrintTimeTable(csortInt::Name);
