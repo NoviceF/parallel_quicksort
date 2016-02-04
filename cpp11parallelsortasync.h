@@ -10,7 +10,8 @@
 #include <thread>
 #include <vector>
 
-#include "lockfreestack.h"
+//#include "lockfreestack.h"
+#include "blockingthreadsafestack.h"
 #include "sortbase.h"
 
 
@@ -26,7 +27,8 @@ struct Sorter
             : promise(new std::promise<std::list<T> >()){}
     };
 
-    LockFreeStack<ChunkToSort> chunks;
+//    LockFreeStack<ChunkToSort> chunks;
+    ThreadsafeStack<ChunkToSort> chunks;
     std::vector<std::thread> threads;
     unsigned const maxThreadCount;
     std::atomic<bool> endOfData;
@@ -78,11 +80,12 @@ struct Sorter
               newLowerChunk.promise->get_future();
 
 //        chunks.push(std::move(newLowerChunk));
-        int size = newLowerChunk.data.size();
         chunks.push(newLowerChunk);
 
         if (threads.size() < maxThreadCount)
-            threads.push_back(std::thread(&Sorter<T>::sortThread, this));
+        {
+            threads.push_back(std::move(std::thread(&Sorter<T>::sortThread, this)));
+        }
 
         std::list<T> newHigher(doSort(chunkData));
 

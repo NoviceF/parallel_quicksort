@@ -7,20 +7,25 @@
 #include "sort.h"
 #include "sorttest.h"
 
+#include "blockingthreadsafestack.h"
+
 int main(int argc, char* argv[])
 {
+
     CommandPromptParser promptParser(argc, argv);
     const ParsedParams params(promptParser.getParams());
     Logger logger;
 
+////    sleep(1);
+////    typedef CSort<int> csortInt;
+////    SingleThreadSortTest<csortInt> csortTest(params);
+////    csortTest.runTest(logger);
 //    sleep(1);
-//    typedef CSort<int> csortInt;
-//    SingleThreadSortTest<csortInt> csortTest(params);
-//    csortTest.runTest(logger);
-    sleep(1);
+
     typedef STLSort<int> stlSortInt;
     SingleThreadSortTest<stlSortInt> stlSortTest(params);
     stlSortTest.runTest(logger);
+
     sleep(1);
 
     typedef PosixParallelSort<int> posixSortInt;

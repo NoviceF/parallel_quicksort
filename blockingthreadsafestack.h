@@ -42,7 +42,7 @@ public:
         std::lock_guard<std::mutex> lock(m);
 
         if (data.empty())
-            throw empty_stack();
+            return std::shared_ptr<T>();
 
         std::shared_ptr<T> const res(
             std::make_shared<T>(std::move(data.top())));
