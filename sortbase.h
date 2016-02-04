@@ -94,7 +94,7 @@ public:
         m_threadsCount = threadsCount;
     }
 
-private:
+protected:
     void doPreSort() override
     {
         if (!m_threadsCount)

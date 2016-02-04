@@ -20,10 +20,10 @@ struct Sorter
     struct ChunkToSort
     {
         std::list<T> data;
-        std::promise<std::list<T> > promise;
+        std::shared_ptr<std::promise<std::list<T> > > promise;
 
-        ChunkToSort() {}
-        ChunkToSort(const ChunkToSort& chunk) = delete;
+        ChunkToSort()
+            : promise(new std::promise<std::list<T> >()){}
     };
 
     LockFreeStack<ChunkToSort> chunks;
@@ -75,9 +75,11 @@ struct Sorter
                                   chunkData, chunkData.begin(),
                                   dividePoint);
         std::future<std::list<T> > newLower =
-              newLowerChunk.promise.get_future();
+              newLowerChunk.promise->get_future();
 
-        chunks.push(std::move(newLowerChunk));
+//        chunks.push(std::move(newLowerChunk));
+        int size = newLowerChunk.data.size();
+        chunks.push(newLowerChunk);
 
         if (threads.size() < maxThreadCount)
             threads.push_back(std::thread(&Sorter<T>::sortThread, this));
@@ -99,7 +101,7 @@ struct Sorter
 
     void sortChunk(std::shared_ptr<ChunkToSort> const& chunk)
     {
-        chunk->promise.set_value(doSort(chunk->data));
+        chunk->promise->set_value(doSort(chunk->data));
     }
 
     void sortThread()
@@ -139,7 +141,7 @@ public:
         m_listToSort.assign(MultiThreadSort<T>::m_vecToSort.begin(),
                             MultiThreadSort<T>::m_vecToSort.end());
 
-        MultiThreadSort<T>::doPostSort();
+        MultiThreadSort<T>::doPreSort();
     }
     void doSort() override
     {
