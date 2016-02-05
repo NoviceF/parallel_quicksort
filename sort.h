@@ -14,6 +14,7 @@
 #include "stlsort.h"
 #include "posixparallelsort.h"
 #include "cpp11parallelsortasync.h"
+#include "cpp11parallelsortpartitioning.h"
 #include "cpp11parallelsortlockfreestack.h"
 
 

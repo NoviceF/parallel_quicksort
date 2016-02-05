@@ -37,7 +37,8 @@ HEADERS += \
     cpp11parallelsortasync.h \
     cpp11parallelsortlockfreestack.h \
     lockfreestack.h \
-    blockingthreadsafestack.h
+    blockingthreadsafestack.h \
+    cpp11parallelsortpartitioning.h
 
 #LIBS += -L/usr/lib -llibboost_program_options
 INCLUDEPATH += $$PWD/deps/include

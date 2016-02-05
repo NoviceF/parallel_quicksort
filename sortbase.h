@@ -2,6 +2,7 @@
 #define SORTBASE_H
 
 #include <algorithm>
+#include <thread>
 #include <vector>
 
 #include "logger.h"
@@ -91,7 +92,7 @@ public:
 
     void setThreadsCount(int threadsCount)
     {
-        m_threadsCount = threadsCount;
+        m_threadsCount = calcThreadsCount(threadsCount);
     }
 
 protected:
@@ -106,6 +107,16 @@ protected:
         SortBase<T>::m_logger.setThreadCount(m_threadsCount);
 
         SortBase<T>::doPreSort();
+    }
+
+private:
+    int calcThreadsCount(int baseValue)
+    {
+        return baseValue
+                ? baseValue
+                : std::thread::hardware_concurrency()
+                  ? std::thread::hardware_concurrency()
+                  : 2;
     }
 
 private:

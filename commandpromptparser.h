@@ -8,11 +8,11 @@ enum FillType //определяет способ заполнения вект�
 
 struct ParsedParams
 {
+    static const int ThreadsCountAutoSelect = 0;
     size_t firstVecSize;
     size_t lastVecSize;
     size_t incStep;
     size_t loopCount;
-    size_t threadsCount;
     size_t thrCountInTest;
     FillType type;
 

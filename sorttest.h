@@ -101,7 +101,7 @@ public:
 private:
     void setupSort(T& sort) override
     {
-        sort.setThreadsCount(MultiThreadSortTest<T>::m_testParams.threadsCount);
+        sort.setThreadsCount(MultiThreadSortTest<T>::m_testParams.thrCountInTest);
     }
 };
 

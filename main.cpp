@@ -32,11 +32,17 @@ int main(int argc, char* argv[])
     MultiThreadSortTest<posixSortInt> posixSortTest(params);
     posixSortTest.runTest(logger);
 
+//    sleep(1);
+
+//    typedef Cpp11ParallelSortAsync<int> asyncSortInt;
+//    MultiThreadSortTest<asyncSortInt> asyncSortTest(params);
+//    asyncSortTest.runTest(logger);
+
     sleep(1);
 
-    typedef Cpp11ParallelSortAsync<int> asyncSortInt;
-    MultiThreadSortTest<asyncSortInt> asyncSortTest(params);
-    asyncSortTest.runTest(logger);
+    typedef Cpp11ParallelSortPartitioning<int> partitioningSortInt;
+    MultiThreadSortTest<partitioningSortInt> partitioningSortTest(params);
+    partitioningSortTest.runTest(logger);
 
 
 
