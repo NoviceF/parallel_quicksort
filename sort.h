@@ -11,6 +11,7 @@
 //#include "posixsortmanager.h"
 //#include "sortbase.h"
 
+#include "csort.h"
 #include "stlsort.h"
 #include "posixparallelsort.h"
 #include "cpp11parallelsortasync.h"

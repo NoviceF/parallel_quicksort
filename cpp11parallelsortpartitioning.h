@@ -180,7 +180,7 @@ private:
 };
 
 template <typename T>
-const std::string Cpp11ParallelSortPartitioning<T>::Name = "Async";
+const std::string Cpp11ParallelSortPartitioning<T>::Name = "Partitioning";
 
 
 #endif // CPP11PARALLELSORTPARTITIONING_H

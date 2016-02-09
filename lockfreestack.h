@@ -3,8 +3,13 @@
 #ifndef LOCKFREESTACK_H
 #define LOCKFREESTACK_H
 
+#include <algorithm>
 #include <atomic>
 #include <memory>
+#include <mutex>
+#include <set>
+#include <thread>
+#include <vector>
 
 
 template <typename T>
@@ -107,6 +112,72 @@ public:
         }
     }
 };
+
+class ThreadsJoiner
+{
+public:
+    explicit ThreadsJoiner(std::vector<std::thread>& threads)
+        : m_threads(threads)
+    {}
+
+    ~ThreadsJoiner()
+    {
+        for (size_t i = 0; i < m_threads.size(); ++i)
+        {
+            if (m_threads[i].joinable())
+                m_threads[i].join();
+        }
+    }
+
+private:
+    std::vector<std::thread>& m_threads;
+};
+
+static LockFreeStack<int> s_lockFreeStack;
+static std::mutex s_mutex;
+static std::multiset<int> s_result;
+
+void pusherThread(std::multiset<int>::iterator begin,
+                  std::multiset<int>::iterator end)
+{
+    for (std::multiset<int>::iterator it = begin; it != end; ++it)
+    {
+        s_lockFreeStack.push(*it);
+    }
+}
+
+
+void getterThread()
+{
+    while (std::shared_ptr<int> value = s_lockFreeStack.pop())
+    {
+        if (value)
+        {
+            std::lock_guard<std::mutex> lock(s_mutex);
+            s_result.insert(*value);
+        }
+    }
+}
+
+void testLockFreeStack()
+{
+    std::multiset<int> numberSet;
+
+    const int setSize = 100;
+
+    std::srand(std::time(0));
+
+    for (int i = 0; i < setSize; ++i)
+    {
+        numberSet.insert(std::rand() % setSize);
+    }
+
+    const int threadsCount = 4;
+
+    std::vector<std::thread> threads(threadsCount);
+
+    ThreadsJoiner(threads);
+}
 
 
 #endif // LOCKFREESTACK_H
