@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <atomic>
+#include <cassert>
 #include <memory>
 #include <mutex>
 #include <set>
@@ -136,6 +137,8 @@ private:
 static LockFreeStack<int> s_lockFreeStack;
 static std::mutex s_mutex;
 static std::multiset<int> s_result;
+static std::atomic<int> s_threadsReadyFlag(0);
+static const int s_pusherThreadsCount = 1;
 
 void pusherThread(std::multiset<int>::iterator begin,
                   std::multiset<int>::iterator end)
@@ -144,13 +147,16 @@ void pusherThread(std::multiset<int>::iterator begin,
     {
         s_lockFreeStack.push(*it);
     }
-}
 
+    s_threadsReadyFlag.fetch_add(1);
+}
 
 void getterThread()
 {
-    while (std::shared_ptr<int> value = s_lockFreeStack.pop())
+    while (s_threadsReadyFlag.load() < s_pusherThreadsCount)
     {
+        std::shared_ptr<int> value = s_lockFreeStack.pop();
+
         if (value)
         {
             std::lock_guard<std::mutex> lock(s_mutex);
@@ -159,11 +165,47 @@ void getterThread()
     }
 }
 
+void initAndStartPushThreads(std::vector<std::thread>& threads,
+                     std::multiset<int> sourceSet)
+{
+    assert(!sourceSet.empty() && s_pusherThreadsCount);
+
+    const size_t partsSize = sourceSet.size() / s_pusherThreadsCount;
+    std::multiset<int>::const_iterator partBegin = sourceSet.begin();
+    std::multiset<int>::const_iterator partEnd = partBegin;
+
+    size_t remaining = partsSize;
+
+    do
+    {
+        partBegin = partEnd;
+
+        remaining = (std::distance(partEnd, sourceSet.end()));
+
+
+        if (remaining < partsSize)
+            std::advance(partBegin, remaining);
+        else
+            std::advance(partEnd, partsSize);
+
+        threads.emplace_back(std::thread(pusherThread, partBegin, partEnd));
+    }
+    while (remaining >= partsSize);
+}
+
+void initAndStartGetterThreads(std::vector<std::thread>& threads, size_t count)
+{
+    for (size_t i = 0; i < count; ++i)
+    {
+        threads.emplace_back(std::thread(getterThread));
+    }
+}
+
 void testLockFreeStack()
 {
     std::multiset<int> numberSet;
 
-    const int setSize = 100;
+    const int setSize = 10;
 
     std::srand(std::time(0));
 
@@ -172,11 +214,15 @@ void testLockFreeStack()
         numberSet.insert(std::rand() % setSize);
     }
 
-    const int threadsCount = 4;
+    {
+        std::vector<std::thread> threads;
+        ThreadsJoiner guard(threads);
+        initAndStartPushThreads(threads, numberSet);
+        initAndStartGetterThreads(threads, s_pusherThreadsCount);
+    }
 
-    std::vector<std::thread> threads(threadsCount);
-
-    ThreadsJoiner(threads);
+    if (numberSet != s_result)
+        throw std::runtime_error("Error working with lockfreestack");
 }
 
 

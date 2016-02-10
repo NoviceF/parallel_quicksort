@@ -13,6 +13,10 @@
 int main(int argc, char* argv[])
 {
     testLockFreeStack();
+
+
+
+
 /*
     CommandPromptParser promptParser(argc, argv);
     const ParsedParams params(promptParser.getParams());
@@ -34,6 +38,7 @@ int main(int argc, char* argv[])
 //    posixSortTest.runTest(logger);
 
 //    sleep(1);
+
 
     typedef Cpp11ParallelSortAsync<int> asyncSortInt;
     MultiThreadSortTest<asyncSortInt> asyncSortTest(params);
