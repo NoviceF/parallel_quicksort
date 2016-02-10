@@ -142,9 +142,12 @@ class LockFreeStackTester
     };
 
 public:
-    LockFreeStackTester(size_t numbersSetSize)
-        : m_pusherThreadsCount(1)
-        , m_setSize(numbersSetSize)
+    LockFreeStackTester(size_t numbersSetSize,
+                        size_t writersCount,
+                        size_t readersCount)
+        : m_setSize(numbersSetSize)
+        , m_pusherThreadsCount(writersCount)
+        , m_getterThreadsCount(readersCount)
     {}
 
     void testLockFreeStack();
@@ -161,9 +164,9 @@ private:
     LockFreeStack<int> m_lockFreeStack;
     std::mutex m_mutex;
     std::multiset<int> m_result;
-//    std::atomic<int> m_threadsReadyFlag;
-    const int m_pusherThreadsCount;
     const size_t m_setSize;
+    const size_t m_pusherThreadsCount;
+    const size_t m_getterThreadsCount;
 };
 
 

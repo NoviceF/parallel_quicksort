@@ -15,8 +15,8 @@ void LockFreeStackTester::testLockFreeStack()
     {
         std::vector<std::thread> threads;
         ThreadsJoiner guard(threads);
+        initAndStartGetterThreads(threads, m_getterThreadsCount);
         initAndStartPushThreads(threads, numberSet);
-        initAndStartGetterThreads(threads, m_pusherThreadsCount);
     }
 
     if (numberSet != m_result)
@@ -56,7 +56,8 @@ void LockFreeStackTester::getterThread()
     }
 }
 
-void LockFreeStackTester::initAndStartPushThreads(std::vector<std::thread>& threads, std::multiset<int> sourceSet)
+void LockFreeStackTester::initAndStartPushThreads(
+        std::vector<std::thread>& threads, std::multiset<int> sourceSet)
 {
     assert(!sourceSet.empty() && m_pusherThreadsCount);
 
@@ -85,12 +86,14 @@ void LockFreeStackTester::initAndStartPushThreads(std::vector<std::thread>& thre
             std::advance(partEnd, partsSize);
         }
 
-        threads.emplace_back(
-            std::thread(&LockFreeStackTester::pusherThread, this, partBegin, partEnd));
+        threads.emplace_back(std::thread(
+                                 &LockFreeStackTester::pusherThread, this,
+                                 partBegin, partEnd));
     }
 }
 
-void LockFreeStackTester::initAndStartGetterThreads(std::vector<std::thread>& threads, size_t count)
+void LockFreeStackTester::initAndStartGetterThreads(
+        std::vector<std::thread>& threads, size_t count)
 {
     for (size_t i = 0; i < count; ++i)
     {

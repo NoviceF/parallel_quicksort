@@ -12,9 +12,12 @@
 
 int main(int argc, char* argv[])
 {
-    for (int i = 0; i < 1000; ++i)
+    for (int i = 0; i < 10000; ++i)
     {
-        LockFreeStackTester tester(1000);
+        const size_t elementCount = 10000;
+        const size_t writersCount = 2;
+        const size_t readersCount = 2;
+        LockFreeStackTester tester(elementCount, writersCount, readersCount);
         tester.testLockFreeStack();
     }
 
