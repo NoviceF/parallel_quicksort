@@ -20,7 +20,8 @@ SOURCES += main.cpp \
     profiler.cpp \
     commandpromptparser.cpp \
     logger.cpp \
-    posixsortmanager.cpp
+    posixsortmanager.cpp \
+    lockfreestack.cpp
 
 HEADERS += \
     profiler.h \

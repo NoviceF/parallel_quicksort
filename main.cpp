@@ -12,7 +12,19 @@
 
 int main(int argc, char* argv[])
 {
-    testLockFreeStack();
+    for (int i = 0; i < 1000; ++i)
+    {
+        LockFreeStackTester tester(1000);
+        tester.testLockFreeStack();
+    }
+
+
+
+
+
+
+
+
 
 
 
