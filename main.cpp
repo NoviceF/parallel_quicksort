@@ -15,7 +15,7 @@ int main(int argc, char* argv[])
 {
     try
     {
-        for (int i = 0; i < 10000; ++i)
+        for (int i = 0; i < 10; ++i)
         {
             const size_t elementCount = 1000;
             const size_t writersCount = 4;

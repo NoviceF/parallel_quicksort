@@ -50,10 +50,14 @@ void LockFreeStackTester::pusherThread(std::vector<int>::const_iterator begin,
                                        std::vector<int>::const_iterator end,
                                        std::shared_future<void> ready)
 {
-    m_writersReadyCounter.fetch_add(1);
+    {
+        std::lock_guard<std::mutex> lock(m_readWriteCountersMutex);
 
-    if (m_writersReadyCounter.load() == m_pusherThreadsCount)
-         m_writersReady.set_value();
+        ++m_writersReadyCounter;
+
+        if (m_writersReadyCounter == m_pusherThreadsCount)
+             m_writersReady.set_value();
+    }
 
     ready.wait();
 
@@ -65,10 +69,14 @@ void LockFreeStackTester::pusherThread(std::vector<int>::const_iterator begin,
 
 void LockFreeStackTester::getterThread(std::shared_future<void> ready)
 {
-    m_readersReadyCounter.fetch_add(1);
+    {
+        std::lock_guard<std::mutex> lock(m_readWriteCountersMutex);
 
-    if (m_readersReadyCounter.load() == m_getterThreadsCount)
-         m_readersReady.set_value();
+        ++m_readersReadyCounter;
+
+        if (m_readersReadyCounter == m_getterThreadsCount)
+             m_readersReady.set_value();
+    }
 
     ready.wait();
 
