@@ -158,8 +158,9 @@ public:
 
 private:
     void pusherThread(std::vector<int>::const_iterator begin,
-                      std::vector<int>::const_iterator end);
-    void getterThread();
+                      std::vector<int>::const_iterator end,
+                      std::shared_future<void> ready);
+    void getterThread(std::shared_future<void> ready);
     void initAndStartPushThreads(std::vector<std::thread>& threads,
                          const std::vector<int>& sourceSet);
     void initAndStartGetterThreads(std::vector<std::thread>& threads, size_t count);

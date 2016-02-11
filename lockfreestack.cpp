@@ -15,14 +15,27 @@ void LockFreeStackTester::testLockFreeStack()
     std::sort(numberSet.begin(), numberSet.end());
 
     {
-        std::vector<std::thread> threads;
-        ThreadsJoiner guard(threads);
-        initAndStartPushThreads(threads, numberSet);
-        initAndStartGetterThreads(threads, m_getterThreadsCount);
+        try
+        {
+            std::vector<std::thread> threads;
+            ThreadsJoiner guard(threads);
+            initAndStartPushThreads(threads, numberSet);
+            initAndStartGetterThreads(threads, m_getterThreadsCount);
 
-        m_writersReady.get_future().wait();
-        m_readersReady.get_future().wait();
-        m_go.set_value();
+            m_writersReady.get_future().wait();
+            m_readersReady.get_future().wait();
+            m_go.set_value();
+        }
+        catch (const std::exception& ex)
+        {
+            m_go.set_value();
+            std::cout << "test execution exception cause " << ex.what() << std::endl;
+        }
+        catch (...)
+        {
+            m_go.set_value();
+            std::cout << "test execution exception" << std::endl;
+        }
     }
 
     std::sort(m_result.begin(), m_result.end());
@@ -34,14 +47,15 @@ void LockFreeStackTester::testLockFreeStack()
 }
 
 void LockFreeStackTester::pusherThread(std::vector<int>::const_iterator begin,
-                                       std::vector<int>::const_iterator end)
+                                       std::vector<int>::const_iterator end,
+                                       std::shared_future<void> ready)
 {
     m_writersReadyCounter.fetch_add(1);
 
     if (m_writersReadyCounter.load() == m_pusherThreadsCount)
          m_writersReady.set_value();
 
-    m_ready.wait();
+    ready.wait();
 
     for (std::vector<int>::const_iterator it = begin; it != end; ++it)
     {
@@ -49,14 +63,14 @@ void LockFreeStackTester::pusherThread(std::vector<int>::const_iterator begin,
     }
 }
 
-void LockFreeStackTester::getterThread()
+void LockFreeStackTester::getterThread(std::shared_future<void> ready)
 {
     m_readersReadyCounter.fetch_add(1);
 
     if (m_readersReadyCounter.load() == m_getterThreadsCount)
          m_readersReady.set_value();
 
-    m_ready.wait();
+    ready.wait();
 
     bool isResultFull = false;
 
@@ -110,7 +124,8 @@ void LockFreeStackTester::initAndStartPushThreads(
 
         threads.emplace_back(std::thread(
                                  &LockFreeStackTester::pusherThread, this,
-                                 partBegin, partEnd));
+                                 partBegin, partEnd, m_ready)
+                             );
     }
 }
 
@@ -119,6 +134,8 @@ void LockFreeStackTester::initAndStartGetterThreads(
 {
     for (size_t i = 0; i < count; ++i)
     {
-        threads.emplace_back(std::thread(&LockFreeStackTester::getterThread, this));
+        threads.emplace_back(std::thread(
+                                 &LockFreeStackTester::getterThread, this, m_ready)
+                             );
     }
 }
