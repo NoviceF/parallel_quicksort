@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <functional>
 
+#include <stdexcept>
 #include <sys/stat.h>
 
 #include "commandpromptparser.h"
@@ -12,16 +13,28 @@
 
 int main(int argc, char* argv[])
 {
-    for (int i = 0; i < 10000; ++i)
+    try
     {
-        const size_t elementCount = 10000;
-        const size_t writersCount = 2;
-        const size_t readersCount = 2;
-        LockFreeStackTester tester(elementCount, writersCount, readersCount);
-        tester.testLockFreeStack();
+        for (int i = 0; i < 10000; ++i)
+        {
+            const size_t elementCount = 100;
+            const size_t writersCount = 10;
+            const size_t readersCount = 10;
+            LockFreeStackTester tester(elementCount, writersCount, readersCount);
+            tester.testLockFreeStack();
+        }
+    }
+    catch (const std::exception& ex)
+    {
+        std::cout << "Can't finish test, cause " << ex.what() << std::endl;
+    }
+    catch (...)
+    {
+        std::cout << "Can't finish test, cause don't no!" << std::endl;
     }
 
 
+//    assert(!"Normal exit");
 
 
 

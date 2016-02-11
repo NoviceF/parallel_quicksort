@@ -153,17 +153,17 @@ public:
     void testLockFreeStack();
 
 private:
-    void pusherThread(std::multiset<int>::iterator begin,
-                      std::multiset<int>::iterator end);
+    void pusherThread(std::vector<int>::const_iterator begin,
+                      std::vector<int>::const_iterator end);
     void getterThread();
     void initAndStartPushThreads(std::vector<std::thread>& threads,
-                         std::multiset<int> sourceSet);
+                         const std::vector<int>& sourceSet);
     void initAndStartGetterThreads(std::vector<std::thread>& threads, size_t count);
 
 private:
     LockFreeStack<int> m_lockFreeStack;
     std::mutex m_mutex;
-    std::multiset<int> m_result;
+    std::vector<int> m_result;
     const size_t m_setSize;
     const size_t m_pusherThreadsCount;
     const size_t m_getterThreadsCount;

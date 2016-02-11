@@ -3,14 +3,16 @@
 
 void LockFreeStackTester::testLockFreeStack()
 {
-    std::multiset<int> numberSet;
+    std::vector<int> numberSet;
 
     std::srand(std::time(0));
 
     for (size_t i = 0; i < m_setSize; ++i)
     {
-        numberSet.insert(std::rand() % m_setSize);
+        numberSet.push_back(std::rand() % m_setSize);
     }
+
+    std::sort(numberSet.begin(), numberSet.end());
 
     {
         std::vector<std::thread> threads;
@@ -19,16 +21,18 @@ void LockFreeStackTester::testLockFreeStack()
         initAndStartPushThreads(threads, numberSet);
     }
 
+    std::sort(m_result.begin(), m_result.end());
+
     if (numberSet != m_result)
         throw std::runtime_error("Error working with lockfreestack");
 
     std::cout << "testLockFreeStack finish succesfully." << std::endl;
 }
 
-void LockFreeStackTester::pusherThread(std::multiset<int>::iterator begin,
-                                       std::multiset<int>::iterator end)
+void LockFreeStackTester::pusherThread(std::vector<int>::const_iterator begin,
+                                       std::vector<int>::const_iterator end)
 {
-    for (std::multiset<int>::iterator it = begin; it != end; ++it)
+    for (std::vector<int>::const_iterator it = begin; it != end; ++it)
     {
         m_lockFreeStack.push(*it);
     }
@@ -52,19 +56,19 @@ void LockFreeStackTester::getterThread()
             break;
 
         std::lock_guard<std::mutex> lock(m_mutex);
-        m_result.insert(*value);
+        m_result.push_back(*value);
     }
 }
 
 void LockFreeStackTester::initAndStartPushThreads(
-        std::vector<std::thread>& threads, std::multiset<int> sourceSet)
+        std::vector<std::thread>& threads, const std::vector<int>& sourceSet)
 {
     assert(!sourceSet.empty() && m_pusherThreadsCount);
 
     const size_t partsSize = sourceSet.size() / m_pusherThreadsCount;
 
-    std::multiset<int>::const_iterator partBegin = sourceSet.begin();
-    std::multiset<int>::const_iterator partEnd = partBegin;
+    std::vector<int>::const_iterator partBegin = sourceSet.begin();
+    std::vector<int>::const_iterator partEnd = partBegin;
 
     size_t remaining = partsSize;
 
