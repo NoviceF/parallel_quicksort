@@ -17,8 +17,12 @@ void LockFreeStackTester::testLockFreeStack()
     {
         std::vector<std::thread> threads;
         ThreadsJoiner guard(threads);
-        initAndStartGetterThreads(threads, m_getterThreadsCount);
         initAndStartPushThreads(threads, numberSet);
+        initAndStartGetterThreads(threads, m_getterThreadsCount);
+
+        m_writersReady.get_future().wait();
+        m_readersReady.get_future().wait();
+        m_go.set_value();
     }
 
     std::sort(m_result.begin(), m_result.end());
@@ -32,6 +36,13 @@ void LockFreeStackTester::testLockFreeStack()
 void LockFreeStackTester::pusherThread(std::vector<int>::const_iterator begin,
                                        std::vector<int>::const_iterator end)
 {
+    m_writersReadyCounter.fetch_add(1);
+
+    if (m_writersReadyCounter.load() == m_pusherThreadsCount)
+         m_writersReady.set_value();
+
+    m_ready.wait();
+
     for (std::vector<int>::const_iterator it = begin; it != end; ++it)
     {
         m_lockFreeStack.push(*it);
@@ -40,6 +51,13 @@ void LockFreeStackTester::pusherThread(std::vector<int>::const_iterator begin,
 
 void LockFreeStackTester::getterThread()
 {
+    m_readersReadyCounter.fetch_add(1);
+
+    if (m_readersReadyCounter.load() == m_getterThreadsCount)
+         m_readersReady.set_value();
+
+    m_ready.wait();
+
     bool isResultFull = false;
 
     while (true)

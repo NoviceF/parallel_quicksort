@@ -15,11 +15,11 @@ int main(int argc, char* argv[])
 {
     try
     {
-        for (int i = 0; i < 10000; ++i)
+        for (int i = 0; i < 100; ++i)
         {
             const size_t elementCount = 100;
-            const size_t writersCount = 10;
-            const size_t readersCount = 10;
+            const size_t writersCount = 1;
+            const size_t readersCount = 1;
             LockFreeStackTester tester(elementCount, writersCount, readersCount);
             tester.testLockFreeStack();
         }

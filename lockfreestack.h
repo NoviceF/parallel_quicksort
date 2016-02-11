@@ -9,6 +9,7 @@
 #include <iostream>
 #include <memory>
 #include <mutex>
+#include <future>
 #include <set>
 #include <thread>
 #include <vector>
@@ -148,6 +149,9 @@ public:
         : m_setSize(numbersSetSize)
         , m_pusherThreadsCount(writersCount)
         , m_getterThreadsCount(readersCount)
+        , m_writersReadyCounter(0)
+        , m_readersReadyCounter(0)
+        , m_ready(m_go.get_future())
     {}
 
     void testLockFreeStack();
@@ -162,11 +166,22 @@ private:
 
 private:
     LockFreeStack<int> m_lockFreeStack;
+
     std::mutex m_mutex;
     std::vector<int> m_result;
+
     const size_t m_setSize;
     const size_t m_pusherThreadsCount;
     const size_t m_getterThreadsCount;
+
+    std::atomic<size_t> m_writersReadyCounter;
+    std::atomic<size_t> m_readersReadyCounter;
+
+    std::promise<void> m_writersReady;
+    std::promise<void> m_readersReady;
+    std::promise<void> m_go;
+
+    std::shared_future<void> m_ready;
 };
 
 
