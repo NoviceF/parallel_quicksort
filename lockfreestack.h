@@ -175,9 +175,8 @@ private:
     const size_t m_pusherThreadsCount;
     const size_t m_getterThreadsCount;
 
-    std::mutex m_readWriteCountersMutex;
-    size_t m_writersReadyCounter;
-    size_t m_readersReadyCounter;
+    std::atomic<size_t> m_writersReadyCounter;
+    std::atomic<size_t> m_readersReadyCounter;
 
     std::promise<void> m_writersReady;
     std::promise<void> m_readersReady;
