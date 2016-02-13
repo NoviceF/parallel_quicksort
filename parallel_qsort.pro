@@ -20,8 +20,7 @@ SOURCES += main.cpp \
     profiler.cpp \
     commandpromptparser.cpp \
     logger.cpp \
-    posixsortmanager.cpp \
-    lockfreestack.cpp
+    posixsortmanager.cpp
 
 HEADERS += \
     profiler.h \
@@ -39,7 +38,8 @@ HEADERS += \
     cpp11parallelsortlockfreestack.h \
     lockfreestack.h \
     blockingthreadsafestack.h \
-    cpp11parallelsortpartitioning.h
+    cpp11parallelsortpartitioning.h \
+    threadsafestructtester.h
 
 #LIBS += -L/usr/lib -llibboost_program_options
 INCLUDEPATH += $$PWD/deps/include
