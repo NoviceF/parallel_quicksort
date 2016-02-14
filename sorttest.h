@@ -33,23 +33,23 @@ inline void fillVectorHalfRandom(std::vector<int>& vecToFill, const size_t vecSi
     }
 }
 
-class ISortTest
+class ITest
 {
 public:
-    virtual ~ISortTest() = 0;
+    virtual ~ITest() = 0;
 
     virtual void runTest(Logger& logger) = 0;
 };
 
-inline ISortTest::~ISortTest()
+inline ITest::~ITest()
 {
 }
 
 template <class T>
-class SingleThreadSortTest : public ISortTest
+class SingleThreadTestRunner : public ITest
 {
 public:
-    SingleThreadSortTest(const ParsedParams& testParams)
+    SingleThreadTestRunner(const ParsedParams& testParams)
         : m_testParams(testParams)
     {
     }
@@ -61,18 +61,18 @@ public:
         do
         {
             logger.setElementsCount(vecSize);
-            std::vector<int> vecToSort;
+            std::vector<int> vecToTest;
             m_testParams.type == fullSort
-                    ? fillVectorFullRandom(vecToSort, vecSize)
-                    : fillVectorHalfRandom(vecToSort, vecSize);
+                    ? fillVectorFullRandom(vecToTest, vecSize)
+                    : fillVectorHalfRandom(vecToTest, vecSize);
 
-            T sort(vecToSort, logger);
-            setupSort(sort);
+            T test(vecToTest, logger);
+            setupTest(test);
 
             for (size_t i = 0; i < m_testParams.loopCount; ++i)
             {
-                std::random_shuffle(vecToSort.begin(), vecToSort.end());
-                sort.makeSort();
+                std::random_shuffle(vecToTest.begin(), vecToTest.end());
+                test();
             }
 
             vecSize += m_testParams.incStep;
@@ -81,7 +81,7 @@ public:
     }
 
 private:
-    virtual void setupSort(T&)
+    virtual void setupTest(T&)
     {
     }
 
@@ -90,18 +90,18 @@ protected:
 };
 
 template <class T>
-class MultiThreadSortTest : public SingleThreadSortTest<T>
+class MultiThreadTestRunner : public SingleThreadTestRunner<T>
 {
 public:
-    MultiThreadSortTest(const ParsedParams& testParams)
-        : SingleThreadSortTest<T>(testParams)
+    MultiThreadTestRunner(const ParsedParams& testParams)
+        : SingleThreadTestRunner<T>(testParams)
     {
     }
 
 private:
-    void setupSort(T& sort) override
+    void setupTest(T& sort) override
     {
-        sort.setThreadsCount(MultiThreadSortTest<T>::m_testParams.thrCountInTest);
+        sort.setThreadsCount(MultiThreadTestRunner<T>::m_testParams.thrCountInTest);
     }
 };
 

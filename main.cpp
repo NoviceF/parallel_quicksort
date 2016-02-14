@@ -32,7 +32,7 @@ int main(int argc, char* argv[])
             for (size_t i = 0; i < iterationsCount; ++i)
             {
                 ThreadSafeStackTester<int> tester(elementCount, writersCount, readersCount);
-                tester.testLockFreeStack();
+                tester();
             }
 
             prof.StopAndPrint();
@@ -47,7 +47,7 @@ int main(int argc, char* argv[])
             {
                 ThreadSafeStackTester<int, ThreadsafeStack> tester(
                             elementCount, writersCount, readersCount);
-                tester.testLockFreeStack();
+                tester();
             }
 
             prof.StopAndPrint();
@@ -77,7 +77,7 @@ int main(int argc, char* argv[])
     Logger logger;
 
     typedef CSort<int> csortInt;
-    SingleThreadSortTest<csortInt> csortTest(params);
+    SingleThreadTestRunner<csortInt> csortTest(params);
     csortTest.runTest(logger);
     sleep(1);
 
@@ -88,7 +88,7 @@ int main(int argc, char* argv[])
 //    sleep(1);
 
     typedef PosixParallelSort<int> posixSortInt;
-    MultiThreadSortTest<posixSortInt> posixSortTest(params);
+    MultiThreadTestRunner<posixSortInt> posixSortTest(params);
     posixSortTest.runTest(logger);
 
     sleep(1);
@@ -103,6 +103,16 @@ int main(int argc, char* argv[])
 //    typedef Cpp11ParallelSortPartitioning<int> partitioningSortInt;
 //    MultiThreadSortTest<partitioningSortInt> partitioningSortTest(params);
 //    partitioningSortTest.runTest(logger);
+
+
+
+    {
+        typedef ThreadSafeStackTester<int> lockFreeIntStackTester;
+        MultiThreadTestRunner<lockFreeIntStackTester> test(params);
+        test.runTest(logger);
+
+        sleep(1);
+    }
 
     logger.printTimeTable(csortInt::Name);
 //    logger.printTimeTable(stlSortInt::Name);

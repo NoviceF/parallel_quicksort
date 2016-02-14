@@ -37,7 +37,7 @@ public:
         , m_ready(m_go.get_future())
     {}
 
-    void testLockFreeStack()
+    void operator()()
     {
         std::vector<int> numberSet;
 
@@ -175,6 +175,7 @@ private:
     CONT<T> m_threadSafeStack;
 
     std::mutex m_mutex;
+    const std::vector<int>& m_source;
     std::vector<int> m_result;
 
     const size_t m_setSize;

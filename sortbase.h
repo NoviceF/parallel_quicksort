@@ -11,7 +11,7 @@
 class ISort
 {
 public:
-    virtual void makeSort() = 0;
+    virtual void operator()() = 0;
     virtual ~ISort() = 0;
 
     virtual std::string name() const = 0;
@@ -35,7 +35,7 @@ public:
 
     virtual ~SortBase() {}
 
-    void makeSort()
+    void operator()()
     {
         doPreSort();
         doSort();
