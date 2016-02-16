@@ -5,7 +5,6 @@
 #include <vector>
 
 #include "logger.h"
-#include "profiler.h"
 #include "sortbase.h"
 
 
@@ -19,7 +18,7 @@ public:
         : SingleThreadSort<T>(vecToSort, logger)
     {}
 
-    void doSort() override
+    void runTask() override
     {
         qsort(
             SortBase<T>::m_vecToSort.data(),

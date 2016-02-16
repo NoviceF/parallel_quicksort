@@ -1,9 +1,12 @@
 #ifndef THREADSAFESTRUCTTESTER_H
 #define THREADSAFESTRUCTTESTER_H
 
+#include <cassert>
+
+#include "taskbase.h"
 
 template <typename T, template <typename> class CONT = LockFreeStack>
-class ThreadSafeStackTester
+class ThreadSafeStackTester : public TaskBase<T>
 {
     class ThreadsJoiner
     {
@@ -26,36 +29,42 @@ class ThreadSafeStackTester
     };
 
 public:
-    ThreadSafeStackTester(size_t numbersSetSize,
-                        size_t writersCount,
-                        size_t readersCount)
-        : m_setSize(numbersSetSize)
-        , m_pusherThreadsCount(writersCount)
-        , m_getterThreadsCount(readersCount)
+    static const std::string Name;
+
+    ThreadSafeStackTester(std::vector<T>& vecToSort, Logger& logger)
+        : TaskBase<T>(vecToSort, logger)
+        , m_source(vecToSort)
+        , m_setSize(m_source.size())
+        , m_pusherThreadsCount(0)
+        , m_getterThreadsCount(0)
         , m_writersReadyCounter(0)
         , m_readersReadyCounter(0)
         , m_ready(m_go.get_future())
     {}
 
-    void operator()()
+    void setThreadsCount(size_t threadsCount)
     {
-        std::vector<int> numberSet;
+        m_pusherThreadsCount = threadsCount;
+        m_getterThreadsCount = threadsCount;
+    }
 
-        std::srand(std::time(0));
+    std::string name() const override
+    {
+        return ThreadSafeStackTester::Name;
+    }
 
-        for (size_t i = 0; i < m_setSize; ++i)
-        {
-            numberSet.push_back(std::rand() % m_setSize);
-        }
-
-        std::sort(numberSet.begin(), numberSet.end());
+    // TaskBase interface
+protected:
+    void runTask() override
+    {
+        std::sort(m_source.begin(), m_source.end());
 
         {
             try
             {
                 std::vector<std::thread> threads;
                 ThreadsJoiner guard(threads);
-                initAndStartPushThreads(threads, numberSet);
+                initAndStartPushThreads(threads, m_source);
                 initAndStartGetterThreads(threads, m_getterThreadsCount);
 
                 m_writersReady.get_future().wait();
@@ -77,7 +86,7 @@ public:
 
         std::sort(m_result.begin(), m_result.end());
 
-        if (numberSet != m_result)
+        if (m_source != m_result)
             throw std::runtime_error("Error working with lockfreestack");
 
         //    std::cout << "testLockFreeStack finish succesfully." << std::endl;
@@ -88,6 +97,8 @@ private:
                       std::vector<int>::const_iterator end,
                       std::shared_future<void> ready)
     {
+        assert(m_pusherThreadsCount);
+
         if (m_writersReadyCounter.fetch_add(1) + 1 == m_pusherThreadsCount)
             m_writersReady.set_value();
 
@@ -98,8 +109,11 @@ private:
             m_threadSafeStack.push(*it);
         }
     }
+
     void getterThread(std::shared_future<void> ready)
     {
+        assert(m_getterThreadsCount);
+
         if (m_readersReadyCounter.fetch_add(1) + 1 == m_getterThreadsCount)
             m_readersReady.set_value();
 
@@ -124,6 +138,7 @@ private:
             m_result.push_back(*value);
         }
     }
+
     void initAndStartPushThreads(std::vector<std::thread>& threads,
                                  const std::vector<int>& sourceSet)
     {
@@ -160,6 +175,7 @@ private:
                                  );
         }
     }
+
     void initAndStartGetterThreads(std::vector<std::thread>& threads, size_t count)
     {
         for (size_t i = 0; i < count; ++i)
@@ -175,12 +191,12 @@ private:
     CONT<T> m_threadSafeStack;
 
     std::mutex m_mutex;
-    const std::vector<int>& m_source;
+    std::vector<int>& m_source;
     std::vector<int> m_result;
 
     const size_t m_setSize;
-    const size_t m_pusherThreadsCount;
-    const size_t m_getterThreadsCount;
+    size_t m_pusherThreadsCount;
+    size_t m_getterThreadsCount;
 
     std::atomic<size_t> m_writersReadyCounter;
     std::atomic<size_t> m_readersReadyCounter;
@@ -191,6 +207,9 @@ private:
 
     std::shared_future<void> m_ready;
 };
+
+template <typename T, template <typename> class CONT>
+const std::string ThreadSafeStackTester<T, CONT>::Name = "TSS";
 
 
 #endif // THREADSAFESTRUCTTESTER_H

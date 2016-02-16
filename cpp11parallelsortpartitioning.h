@@ -140,14 +140,14 @@ public:
         : MultiThreadSort<T>(vecToSort, logger)
     {}
 
-    void doPreSort() override
+    void initTask() override
     {
         m_listToSort.assign(MultiThreadSort<T>::m_vecToSort.begin(),
                             MultiThreadSort<T>::m_vecToSort.end());
 
-        MultiThreadSort<T>::doPreSort();
+        MultiThreadSort<T>::initTask();
     }
-    void doSort() override
+    void runTask() override
     {
         m_listToSort = parallelQuickSort(
                     m_listToSort,
@@ -155,7 +155,7 @@ public:
                     );
     }
 
-    void doPostSort() override
+    void finalizeTask() override
     {
         MultiThreadSort<T>::m_logger.saveTime(
                     MultiThreadSort<T>::m_profiler.StopAndGetDifference());

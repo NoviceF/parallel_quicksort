@@ -19,7 +19,7 @@ public:
         : SingleThreadSort<T>(vecToSort, logger)
     {}
 
-    void doSort() override
+    void runTask() override
     {
         std::sort(
             SortBase<T>::m_vecToSort.begin(),

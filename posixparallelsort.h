@@ -18,7 +18,7 @@ public:
         : MultiThreadSort<T>(vecToSort, logger)
     {}
 
-    void doSort() override
+    void runTask() override
     {
         const size_t vecSize = SortBase<T>::m_vecToSort.size();
 

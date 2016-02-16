@@ -14,53 +14,52 @@
 
 #include "threadsafestructtester.h"
 
-
 int main(int argc, char* argv[])
 {
-    try
-    {
-        const size_t elementCount = 1000000;
-        const size_t writersCount = 4;
-        const size_t readersCount = 4;
-        const size_t iterationsCount = 1;
+//    try
+//    {
+//        const size_t elementCount = 1000000;
+//        const size_t writersCount = 4;
+//        const size_t readersCount = 4;
+//        const size_t iterationsCount = 1;
 
-        {
-            std::cout << "Test lock free stack.." << std::endl;
-            Prof prof;
-            prof.StartMeas();
+//        {
+//            std::cout << "Test lock free stack.." << std::endl;
+//            Prof prof;
+//            prof.StartMeas();
 
-            for (size_t i = 0; i < iterationsCount; ++i)
-            {
-                ThreadSafeStackTester<int> tester(elementCount, writersCount, readersCount);
-                tester();
-            }
+//            for (size_t i = 0; i < iterationsCount; ++i)
+//            {
+//                ThreadSafeStackTester<int> tester(elementCount, writersCount, readersCount);
+//                tester();
+//            }
 
-            prof.StopAndPrint();
-        }
+//            prof.StopAndPrint();
+//        }
 
-        {
-            std::cout << "Test stack with blocking.." << std::endl;
-            Prof prof;
-            prof.StartMeas();
+//        {
+//            std::cout << "Test stack with blocking.." << std::endl;
+//            Prof prof;
+//            prof.StartMeas();
 
-            for (size_t i = 0; i < iterationsCount; ++i)
-            {
-                ThreadSafeStackTester<int, ThreadsafeStack> tester(
-                            elementCount, writersCount, readersCount);
-                tester();
-            }
+//            for (size_t i = 0; i < iterationsCount; ++i)
+//            {
+//                ThreadSafeStackTester<int, ThreadsafeStack> tester(
+//                            elementCount, writersCount, readersCount);
+//                tester();
+//            }
 
-            prof.StopAndPrint();
-        }
-    }
-    catch (const std::exception& ex)
-    {
-        std::cout << "Can't finish test, cause " << ex.what() << std::endl;
-    }
-    catch (...)
-    {
-        std::cout << "Can't finish test, cause don't no!" << std::endl;
-    }
+//            prof.StopAndPrint();
+//        }
+//    }
+//    catch (const std::exception& ex)
+//    {
+//        std::cout << "Can't finish test, cause " << ex.what() << std::endl;
+//    }
+//    catch (...)
+//    {
+//        std::cout << "Can't finish test, cause don't no!" << std::endl;
+//    }
 
 
 
@@ -87,11 +86,11 @@ int main(int argc, char* argv[])
 
 //    sleep(1);
 
-    typedef PosixParallelSort<int> posixSortInt;
-    MultiThreadTestRunner<posixSortInt> posixSortTest(params);
-    posixSortTest.runTest(logger);
+//    typedef PosixParallelSort<int> posixSortInt;
+//    MultiThreadTestRunner<posixSortInt> posixSortTest(params);
+//    posixSortTest.runTest(logger);
 
-    sleep(1);
+//    sleep(1);
 
 
 //    typedef Cpp11ParallelSortAsync<int> asyncSortInt;
@@ -101,7 +100,7 @@ int main(int argc, char* argv[])
 //    sleep(1);
 
 //    typedef Cpp11ParallelSortPartitioning<int> partitioningSortInt;
-//    MultiThreadSortTest<partitioningSortInt> partitioningSortTest(params);
+//    MultiThreadTestRunner<partitioningSortInt> partitioningSortTest(params);
 //    partitioningSortTest.runTest(logger);
 
 
@@ -111,7 +110,7 @@ int main(int argc, char* argv[])
         MultiThreadTestRunner<lockFreeIntStackTester> test(params);
         test.runTest(logger);
 
-        sleep(1);
+//        sleep(1);
     }
 
     logger.printTimeTable(csortInt::Name);

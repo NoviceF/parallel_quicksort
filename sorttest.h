@@ -5,7 +5,7 @@
 #include <vector>
 
 #include "commandpromptparser.h"
-#include "sort.h"
+#include "taskbase.h"
 
 
 inline void fillVectorFullRandom(std::vector<int>& vecToFill, const size_t vecSize)
@@ -54,6 +54,8 @@ public:
     {
     }
 
+    ~SingleThreadTestRunner() override {}
+
     void runTest(Logger& logger) override
     {
         size_t vecSize = m_testParams.firstVecSize;
@@ -98,10 +100,12 @@ public:
     {
     }
 
+    ~MultiThreadTestRunner() override {}
+
 private:
-    void setupTest(T& sort) override
+    void setupTest(T& test) override
     {
-        sort.setThreadsCount(MultiThreadTestRunner<T>::m_testParams.thrCountInTest);
+        test.setThreadsCount(MultiThreadTestRunner<T>::m_testParams.thrCountInTest);
     }
 };
 

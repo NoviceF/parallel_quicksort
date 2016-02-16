@@ -2,67 +2,33 @@
 #define SORTBASE_H
 
 #include <algorithm>
-#include <thread>
+#include <stdexcept>
 #include <vector>
 
 #include "logger.h"
-#include "profiler.h"
+#include "taskbase.h"
 
-class ISort
-{
-public:
-    virtual void operator()() = 0;
-    virtual ~ISort() = 0;
-
-    virtual std::string name() const = 0;
-};
-
-inline ISort::~ISort()
-{
-}
 
 template <typename T>
-class SortBase : public ISort
+class SortBase : public TaskBase<T>
 {
 public:
     SortBase(std::vector<T>& vecToSort, Logger& logger)
-        : m_vecToSort(vecToSort)
-        , m_logger(logger)
+        : TaskBase<T>(vecToSort, logger)
     {
-        if (m_vecToSort.empty())
-            throw std::runtime_error("SortBase<T>::SortBas: vec to sort is empty!");
-    }
-
-    virtual ~SortBase() {}
-
-    void operator()()
-    {
-        doPreSort();
-        doSort();
-        doPostSort();
     }
 
 protected:
-    virtual void doPreSort()
+    void finalizeTask() override
     {
-        m_logger.setSortName(name());
-        m_profiler.StartMeas();
-    }
+        TaskBase<T>::finalizeTask();
 
-    virtual void doSort() = 0;
-
-    virtual void doPostSort()
-    {
-        m_logger.saveTime(m_profiler.StopAndGetDifference());
-
-        if (!std::is_sorted(m_vecToSort.begin(), m_vecToSort.end()))
+        if (!std::is_sorted(TaskBase<T>::m_vecToSort.begin(),
+                            TaskBase<T>::m_vecToSort.end()))
+        {
             throw std::runtime_error("SortBase::doPostSort: vec is not sorted!");
+        }
     }
-
-protected:
-    std::vector<T>& m_vecToSort;
-    Logger& m_logger;
-    Prof m_profiler;
 };
 
 template <typename T>
@@ -92,11 +58,11 @@ public:
 
     void setThreadsCount(int threadsCount)
     {
-        m_threadsCount = calcThreadsCount(threadsCount);
+        m_threadsCount = threadsCount;
     }
 
 protected:
-    void doPreSort() override
+    void initTask() override
     {
         if (!m_threadsCount)
         {
@@ -106,17 +72,7 @@ protected:
 
         SortBase<T>::m_logger.setThreadCount(m_threadsCount);
 
-        SortBase<T>::doPreSort();
-    }
-
-private:
-    int calcThreadsCount(int baseValue)
-    {
-        return baseValue
-                ? baseValue
-                : std::thread::hardware_concurrency()
-                  ? std::thread::hardware_concurrency()
-                  : 2;
+        SortBase<T>::initTask();
     }
 
 private:

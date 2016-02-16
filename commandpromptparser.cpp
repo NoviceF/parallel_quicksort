@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <iostream>
 #include <iterator>
+#include <thread>
 
 #include <program_options.hpp>
 
@@ -25,6 +26,16 @@ std::vector<std::string> vecsSplit(std::string cDelimiter,
 
     return vecRes;
 }
+
+int calcThreadsCount(int baseValue)
+{
+    return baseValue
+            ? baseValue
+            : std::thread::hardware_concurrency()
+              ? std::thread::hardware_concurrency()
+              : 2;
+}
+
 
 CommandPromptParser::CommandPromptParser(int argc, char* argv[])
     : m_params(getParamsFormArgs(argc, argv))
@@ -90,7 +101,7 @@ ParsedParams CommandPromptParser::getParamsFormArgs(int argc, char* argv[])
             params.lastVecSize = ::lexical_cast<int, std::string> (vecStr[1]);
             params.incStep = ::lexical_cast<int, std::string> (vecStr[2]);
             params.loopCount = ::lexical_cast<int, std::string> (vecStr[3]);
-            params.thrCountInTest = ::lexical_cast<int, std::string> (vecStr[4]);
+            params.thrCountInTest = calcThreadsCount(::lexical_cast<int, std::string> (vecStr[4]));
             params.type = static_cast<FillType>(fillType);
 
             if (!params.incStep)
@@ -99,6 +110,7 @@ ParsedParams CommandPromptParser::getParamsFormArgs(int argc, char* argv[])
         else
         {
             params.type = static_cast<FillType>(fillType);
+            params.thrCountInTest = calcThreadsCount(params.thrCountInTest);
         }
     }
     catch (const std::exception& ex)
