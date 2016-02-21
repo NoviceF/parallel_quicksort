@@ -2,7 +2,10 @@
 #define THREADSAFESTRUCTTESTER_H
 
 #include <cassert>
+#include <stdexcept>
 
+#include "blockingthreadsafestack.h"
+#include "lockfreestack.h"
 #include "taskbase.h"
 
 template <typename T, template <typename> class CONT = LockFreeStack>
@@ -29,8 +32,6 @@ class ThreadSafeStackTester : public TaskBase<T>
     };
 
 public:
-    static const std::string Name;
-
     ThreadSafeStackTester(std::vector<T>& vecToSort, Logger& logger)
         : TaskBase<T>(vecToSort, logger)
         , m_source(vecToSort)
@@ -48,10 +49,7 @@ public:
         m_getterThreadsCount = threadsCount;
     }
 
-    std::string name() const override
-    {
-        return ThreadSafeStackTester::Name;
-    }
+    std::string name() const override;
 
     // TaskBase interface
 protected:
@@ -69,6 +67,7 @@ protected:
 
                 m_writersReady.get_future().wait();
                 m_readersReady.get_future().wait();
+                TaskBase<T>::initTask();
                 m_go.set_value();
             }
             catch (const std::exception& ex)
@@ -82,6 +81,8 @@ protected:
                 m_go.set_value();
                 std::cout << "test execution exception" << std::endl;
             }
+
+            TaskBase<T>::finalizeTask();
         }
 
         std::sort(m_result.begin(), m_result.end());
@@ -90,6 +91,13 @@ protected:
             throw std::runtime_error("Error working with lockfreestack");
 
         //    std::cout << "testLockFreeStack finish succesfully." << std::endl;
+    }
+
+    void initTask() override
+    {
+    }
+    void finalizeTask() override
+    {
     }
 
 private:
@@ -206,10 +214,27 @@ private:
     std::promise<void> m_go;
 
     std::shared_future<void> m_ready;
+
 };
 
 template <typename T, template <typename> class CONT>
-const std::string ThreadSafeStackTester<T, CONT>::Name = "TSS";
+std::string ThreadSafeStackTester<T, CONT>::name() const
+{
+    throw std::runtime_error("Not implemented!");
+}
+
+template <>
+std::string ThreadSafeStackTester<int, LockFreeStack>::name() const
+{
+    return "TSS"; // thread safe stack
+}
+
+template <>
+std::string ThreadSafeStackTester<int, ThreadsafeStack>::name() const
+{
+    return "BS"; // blocking stack
+}
 
 
 #endif // THREADSAFESTRUCTTESTER_H
+

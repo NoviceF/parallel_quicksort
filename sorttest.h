@@ -68,11 +68,11 @@ public:
                     ? fillVectorFullRandom(vecToTest, vecSize)
                     : fillVectorHalfRandom(vecToTest, vecSize);
 
-            T test(vecToTest, logger);
-            setupTest(test);
-
             for (size_t i = 0; i < m_testParams.loopCount; ++i)
             {
+                T test(vecToTest, logger);
+                setupTest(test);
+
                 std::random_shuffle(vecToTest.begin(), vecToTest.end());
                 test();
             }
