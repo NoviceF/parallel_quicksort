@@ -32,7 +32,7 @@ class CommandPromptParser
 {
 public:
     CommandPromptParser(int argc, char* argv[]);
-    const ParsedParams& getParams() const { return m_params; }
+    const ParsedParams getParams() const { return m_params; }
 
 private:
     static ParsedParams getParamsFormArgs(int argc, char* argv[]);
