@@ -6,6 +6,7 @@
 
 #include "blockingthreadsafestack.h"
 #include "lockfreestack.h"
+#include "metainfo.h"
 #include "taskbase.h"
 
 template <typename T, template <typename> class CONT = LockFreeStack>
@@ -235,6 +236,8 @@ std::string ThreadSafeStackTester<int, ThreadsafeStack>::name() const
     return "BS"; // blocking stack
 }
 
+//TaskMetaManager::registerTaskMeta<ThreadSafeStackTester<int> >(
+//        TaskMetaManager::structs, make_simple_creator<ThreadSafeStackTester>);
 
 #endif // THREADSAFESTRUCTTESTER_H
 

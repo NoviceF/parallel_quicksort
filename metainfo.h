@@ -1,6 +1,7 @@
 #ifndef METAINFO_H
 #define METAINFO_H
 
+#include <functional>
 #include <map>
 #include <memory>
 #include <stdexcept>
@@ -9,27 +10,28 @@
 
 #include "taskbase.h"
 
-class TaskMetaTypeBase
-{
-    virtual ITask* createInstance()
-    {
-        throw std::runtime_error("Not implemented!");
-    }
-};
+typedef std::function<ITask*()> TaskCreator;
 
 template <typename T>
-class TaskMetaType : public TaskMetaTypeBase
+TaskCreator make_simple_creator()
+{
+    return [](){ return new T; };
+}
+
+class TaskMetaType
 {
 public:
-    TaskMetaType()
-    {
+    TaskMetaType(TaskCreator creator)
+        : m_creator(creator)
+    {}
 
+    std::unique_ptr<ITask> createInstance()
+    {
+        return std::unique_ptr<ITask>(m_creator());
     }
 
-    ITask* createInstance()
-    {
-
-    }
+private:
+    TaskCreator m_creator;
 };
 
 class TaskMetaManager
@@ -44,20 +46,33 @@ public:
 
 public:
     template <typename T>
-    void registerTaskMeta(Categories category)
+    static void registerTaskMeta(Categories category,
+                          TaskCreator typeCreator)
     {
         static_assert(totalCount == 2, "Need to sync categories list!");
 
         m_typesInfo[category][std::type_index(typeid(T))]
-                = std::make_shared(TaskMetaType<T>());
+                = TaskMetaType(typeCreator);
     }
 
 private:
-    typedef std::map<std::type_index, std::shared_ptr<TaskMetaTypeBase> > IndexToMetaMap;
+    typedef std::map<std::type_index, std::shared_ptr<TaskMetaType> > IndexToMetaMap;
     typedef std::map<Categories, IndexToMetaMap> CategoryMap;
 
-    CategoryMap m_typesInfo;
+    static CategoryMap m_typesInfo;
 };
+
+template <template <typename> class T, typename U>
+class MetaRegistrator
+{
+public:
+    MetaRegistrator(TaskMetaManager::Categories category)
+    {
+        TaskMetaManager::registerTaskMeta<T<U> >(category,
+                                                 make_simple_creator<T>);
+    }
+};
+
 
 #endif // METAINFO_H
 

@@ -22,6 +22,9 @@ int main(int argc, char* argv[])
     const ParsedParams params(promptParser.getParams());
     Logger logger;
 
+
+
+
 //    algorithmsTest(params, logger);
     structsTest(params, logger);
 
