@@ -10,13 +10,9 @@
 
 #include "taskbase.h"
 
-typedef std::function<ITask*()> TaskCreator;
 
-template <typename T>
-TaskCreator make_simple_creator()
-{
-    return [](){ return new T; };
-}
+typedef std::function<ITask*()> TaskCreator;
+//typedef std::function<void*()> TaskCreator;
 
 class TaskMetaType
 {
@@ -25,10 +21,15 @@ public:
         : m_creator(creator)
     {}
 
-    std::unique_ptr<ITask> createInstance()
+    ITask* createInstance()
     {
-        return std::unique_ptr<ITask>(m_creator());
+        return m_creator();
     }
+
+//    std::unique_ptr<ITask> createInstance()
+//    {
+//        return std::unique_ptr<ITask>(m_creator());
+//    }
 
 private:
     TaskCreator m_creator;
@@ -47,31 +48,51 @@ public:
 public:
     template <typename T>
     static void registerTaskMeta(Categories category,
-                          TaskCreator typeCreator)
+                                 TaskCreator typeCreator)
     {
         static_assert(totalCount == 2, "Need to sync categories list!");
 
-        m_typesInfo[category][std::type_index(typeid(T))]
-                = TaskMetaType(typeCreator);
+        const auto pairToInsert
+                = std::make_pair(std::type_index(typeid(T)),
+                                 TaskMetaType(typeCreator));
+
+        if (m_typesInfo[category].insert(pairToInsert).second == false)
+        {
+            throw std::runtime_error("TaskMetaManager::registerTaskMeta: "
+                                     "Try add element, that already exists.");
+        }
     }
 
 private:
-    typedef std::map<std::type_index, std::shared_ptr<TaskMetaType> > IndexToMetaMap;
+    typedef std::map<std::type_index, TaskMetaType> IndexToMetaMap;
     typedef std::map<Categories, IndexToMetaMap> CategoryMap;
 
     static CategoryMap m_typesInfo;
 };
 
-template <template <typename> class T, typename U>
+TaskMetaManager::CategoryMap TaskMetaManager::m_typesInfo;
+
+template <typename T>
+TaskCreator make_simple_creator()
+{
+    // if T has one base type set one argument to lambda:
+    // [](arg1, arg2..)->ITask* { return new T(arg1, arg2...); })
+    return TaskCreator([]()->ITask* { return new T; });
+//    return TaskCreator();
+}
+
+template <typename T>
 class MetaRegistrator
 {
 public:
     MetaRegistrator(TaskMetaManager::Categories category)
     {
-        TaskMetaManager::registerTaskMeta<T<U> >(category,
-                                                 make_simple_creator<T>);
+        TaskMetaManager::registerTaskMeta<T>(
+            category, make_simple_creator<T>());
     }
 };
+
+//static MetaRegistrator<int> s_reg(TaskMetaManager::sorts);
 
 
 #endif // METAINFO_H

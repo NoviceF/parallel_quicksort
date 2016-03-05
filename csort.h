@@ -46,7 +46,7 @@ public:
 template <typename T>
 const std::string CSort<T>::Name = "C";
 
-static MetaRegistrator<CSort, int> s_reg(TaskMetaManager::sorts);
+static MetaRegistrator<CSort<int> > s_reg(TaskMetaManager::sorts);
 
 
 #endif // CSORT_H
