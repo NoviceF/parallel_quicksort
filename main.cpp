@@ -8,7 +8,6 @@
 
 #include "blockingthreadsafestack.h"
 #include "lockfreestack.h"
-#include "metainfo.h"
 #include "profiler.h"
 
 #include "threadsafestructtester.h"

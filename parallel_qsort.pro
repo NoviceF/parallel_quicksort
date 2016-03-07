@@ -40,8 +40,7 @@ HEADERS += \
     blockingthreadsafestack.h \
     cpp11parallelsortpartitioning.h \
     threadsafestructtester.h \
-    taskbase.h \
-    metainfo.h
+    taskbase.h
 
 #LIBS += -L/usr/lib -llibboost_program_options
 INCLUDEPATH += $$PWD/deps/include

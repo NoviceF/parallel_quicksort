@@ -6,8 +6,8 @@
 
 #include "blockingthreadsafestack.h"
 #include "lockfreestack.h"
-#include "metainfo.h"
 #include "taskbase.h"
+
 
 template <typename T, template <typename> class CONT = LockFreeStack>
 class ThreadSafeStackTester : public TaskBase<T>
