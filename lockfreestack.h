@@ -118,6 +118,47 @@ public:
             }
         }
     }
+
+    bool pop(T& value)
+    {
+        CountedNodePtr oldHead = head.load(std::memory_order_relaxed);
+
+        for(;;)
+        {
+            increaseHeadCount(oldHead);
+            Node* const ptr = oldHead.ptr;
+
+            if (!ptr)
+            {
+                return false;
+            }
+
+            if (head.compare_exchange_strong(oldHead, ptr->next,
+                                             std::memory_order_relaxed))
+            {
+                std::shared_ptr<T> res;
+                res.swap(ptr->data);
+                int const countIncrease = oldHead.externalCount - 2;
+
+                if (ptr->internalCount.fetch_add(
+                            countIncrease, std::memory_order_release)
+                        == -countIncrease)
+                {
+                    delete ptr;
+                }
+
+                value = *res;
+
+                return true;
+            }
+            else if (ptr->internalCount.fetch_add(
+                         -1, std::memory_order_relaxed) == 1)
+            {
+                ptr->internalCount.load(std::memory_order_acquire);
+                delete ptr;
+            }
+        }
+    }
 };
 
 

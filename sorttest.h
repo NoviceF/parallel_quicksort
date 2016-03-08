@@ -36,7 +36,6 @@ inline void fillVectorHalfRandom(std::vector<int>& vecToFill, const size_t vecSi
 class ITest
 {
 public:
-    ITest(const ParsedParams&) {}
     virtual ~ITest() = 0;
 
     virtual void runTest(Logger& logger) = 0;
