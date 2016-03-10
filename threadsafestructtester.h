@@ -5,6 +5,7 @@
 #include <stdexcept>
 
 #include "blockingthreadsafestack.h"
+#include "common.h"
 #include "lockfreestack.h"
 #include "taskbase.h"
 
@@ -12,26 +13,6 @@
 template <typename T, template <typename> class CONT = LockFreeStack>
 class ThreadSafeStackTester : public TaskBase<T>
 {
-    class ThreadsJoiner
-    {
-    public:
-        explicit ThreadsJoiner(std::vector<std::thread>& threads)
-            : m_threads(threads)
-        {}
-
-        ~ThreadsJoiner()
-        {
-            for (size_t i = 0; i < m_threads.size(); ++i)
-            {
-                if (m_threads[i].joinable())
-                    m_threads[i].join();
-            }
-        }
-
-    private:
-        std::vector<std::thread>& m_threads;
-    };
-
 public:
     ThreadSafeStackTester(std::vector<T>& vecToSort, Logger& logger)
         : TaskBase<T>(vecToSort, logger)
