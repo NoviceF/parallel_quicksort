@@ -14,6 +14,7 @@
 
 #include "common.h"
 #include "lockfreestack.h"
+#include "quicksortimpl.h"
 #include "sortbase.h"
 
 
@@ -39,52 +40,87 @@ public:
     void initTask() override
     {
         assert(std::atomic<Indeces>().is_lock_free());
+//        MultiThreadSort<T>::m_vecToSort = { 5, 2, 0, 1, 6, 3};
         m_stack.push({ 0, MultiThreadSort<T>::m_vecToSort.size() - 1 });
         MultiThreadSort<T>::initTask();
     }
 
     void sortRoutine()
     {
-        Indeces indcs = { 0, 0 };
-        // try process new interval from stack
-        while (!m_stack.pop(indcs))
+        std::stack<Indeces> localStack;
+
+        while (true)
         {
-            if (m_jobIsDone.load())
-                return;
+            Indeces indcs = { 0, 0 };
 
-            if (m_threadsWaitingCounter.fetch_add(1) + 1
-                    == MultiThreadSort<T>::threadsCount())
+            if (localStack.empty())
             {
-                std::unique_lock<std::mutex> lock(m_condMutex);
-                m_jobIsDone.store(true);
-                m_condVar.notify_all();
-                return;
+                // try process new interval from stack
+                while (!m_stack.pop(indcs))
+                {
+                    if (m_jobIsDone.load())
+                        return;
+
+                    std::unique_lock<std::mutex> lock(m_condMutex);
+
+                    if (m_threadsWaitingCounter.fetch_add(1) + 1
+                            == MultiThreadSort<T>::threadsCount())
+                    {
+                        assert(std::is_sorted(
+                                   MultiThreadSort<T>::m_vecToSort.begin(),
+                                   MultiThreadSort<T>::m_vecToSort.end()));
+                        m_jobIsDone.store(true);
+                        m_condVar.notify_all();
+                        return;
+                    }
+
+                    if (!m_jobIsDone.load())
+                        m_condVar.wait(lock);
+
+                    m_threadsWaitingCounter.fetch_sub(1);
+                }
             }
+            else
+            {
+               indcs = localStack.top();
+               localStack.pop();
+            }
+            // sort getted interval
+            assert(indcs.begin < indcs.end);
 
-            std::unique_lock<std::mutex> lock(m_condMutex);
+            std::vector<T>& input = MultiThreadSort<T>::m_vecToSort;
 
-            if (!m_jobIsDone.load())
-                m_condVar.wait(lock);
+            size_t pivotPos = 0;
+            quicksort(input, indcs.begin, indcs.end, &pivotPos);
+            Indeces lowerPart = { indcs.begin, pivotPos ? pivotPos - 1 : 0 };
+            Indeces higherPart = { pivotPos + 1, indcs.end };
 
-            m_threadsWaitingCounter.fetch_sub(1);
+            if (lowerPart.begin < lowerPart.end)
+                m_stack.push(lowerPart);
+
+            if (higherPart.begin < higherPart.end)
+            {
+                if (m_threadsWaitingCounter.load())
+                {
+                    std::unique_lock<std::mutex> lock(m_condMutex);
+
+                    if (m_threadsWaitingCounter.load())
+                    {
+                        m_stack.push(higherPart);
+                        m_condVar.notify_one();
+                    }
+                    else
+                    {
+                        lock.unlock();
+                        localStack.push(higherPart);
+                    }
+                }
+                else
+                {
+                    localStack.push(higherPart);
+                }
+            }
         }
-        // sort getted interval
-        if (indcs.begin >= indcs.end)
-            return;
-
-        std::vector<T>& input = MultiThreadSort<T>::m_vecToSort;
-        T const& pivot = input[indcs.begin];
-
-        auto divide_point = std::partition(input.begin() + indcs.begin,
-                                           input.begin() + indcs.end,
-                                           [&](T const& t){ return t < pivot; });
-        Indeces lower_part = {
-            indcs.begin, static_cast<size_t>((divide_point - 1) - input.begin()) };
-        Indeces higher_part = {
-            static_cast<size_t>((divide_point) - input.begin()), indcs.end };
-
-        m_stack.push(lower_part);
-        m_stack.push(higher_part);
     }
 
     void runTask() override
@@ -117,7 +153,21 @@ private:
 };
 
 template <typename T>
-const std::string Cpp11ParallelSortLockFreeStack<T>::Name = "LFSQs";
+const std::string Cpp11ParallelSortLockFreeStack<T>::Name = "LFS";
+
+//            T const pivot = input[indcs.begin];
+
+//            using vecIter = typename std::vector<T>::iterator;
+//            vecIter beginIter = input.begin() + indcs.begin;
+//            vecIter endIter = (input.begin() + indcs.end) + 1;
+//            vecIter middle1 = std::partition(beginIter, endIter,
+//                                          [&](T const& t){ return t < pivot; });
+//            vecIter middle2 = std::partition(middle1, endIter,
+//                                          [&](T const& t){ return !(pivot < t); });
+//            const size_t middle1Pos = middle1 - input.begin();
+//            const size_t middle2Pos = middle2 - input.begin();
+//            Indeces lowerPart = { indcs.begin, middle1Pos ? middle1Pos - 1 : 0};
+//            Indeces higherPart = { middle2Pos, indcs.end };
 
 
 #endif // CPP11PARALLELSORTLOCKFREESTACK_H

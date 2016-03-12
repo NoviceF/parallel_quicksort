@@ -1,13 +1,13 @@
 #ifndef SORTIMPL_H
 #define SORTIMPL_H
 
-#include <vector>
+#include <cassert>
 #include <iostream>
+#include <vector>
 
-static const int M = 15;
 
 template<typename T>
-void exch(std::vector<T>& a, int x, int y)
+void exch(std::vector<T>& a, size_t x, size_t y)
 {
     if (x != y)
     {
@@ -18,35 +18,37 @@ void exch(std::vector<T>& a, int x, int y)
 }
 
 template<typename T>
-int partition(std::vector<T>& a, int* start, int* end)
+int partition(std::vector<T>& a, size_t start, size_t end)
 {
-    int i = *start - 1;
-    int j = *end;
-    T v = a[*end];
+    int i = start - 1;
+    int j = end;
+    T v = a[end];
 
     for (;;)
     {
         while (a[++i] < v);
-        while (v < a[--j]) if (j == *start) break;
+        while (v < a[--j]) if (j == start) break;
         if (i >= j) break;
 
         exch(a, i, j);
     }
 
-    exch(a, i, *end);
+    exch(a, i, end);
 
     return i;
 }
 
 template<typename T>
-void quicksort(std::vector<T>& a, int* start, int* end, int* i)
+void quicksort(std::vector<T>& a, size_t start, size_t end, size_t* i)
 {
-    if (*end <= *start)
+    assert(i);
+
+    if (end <= start)
     {
         std::cout << "in qsort end <= start" << std::endl;
-        std::cout << "start = " << *start << std::endl;
+        std::cout << "start = " << start << std::endl;
         std::cout << "i = " << *i << std::endl;
-        std::cout << "end = " << *end << std::endl;
+        std::cout << "end = " << end << std::endl;
 
         return;
     }

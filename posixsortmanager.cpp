@@ -11,9 +11,9 @@ Manager::Manager(std::vector<int>& sourceVec, int threadsTotal)
     , jobEnd_(0)
     , threadsTotal_(threadsTotal) { }
 
-void Manager::addWork(int vecSize)
+void Manager::addWork(size_t vecSize)
 {
-    int vecStart = 0;
+    size_t vecStart = 0;
     pthread_mutex_lock(&mutexQue);
     jobEnd_ = false;
 
@@ -69,9 +69,9 @@ void * f(void * arg)
             Coords cd1 = localDeq.top();
             localDeq.pop();
 
-            quicksort(mn.vec(), &cd1.start, &cd1.end, &cd1.pivot);
+            quicksort(mn.vec(), cd1.start, cd1.end, &cd1.pivot);
 
-            if (cd1.start < cd1.pivot - 1) localDeq.push(
+            if (cd1.pivot && cd1.start < cd1.pivot - 1) localDeq.push(
                     Coords{cd1.start, cd1.pivot - 1, cd1.pivot}
             );
 

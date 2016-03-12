@@ -14,9 +14,9 @@
 // сортируемого диапазона в очередь
 struct Coords
 {
-    int start;
-    int end;
-    int pivot;
+    size_t start;
+    size_t end;
+    size_t pivot;
 };
 
 // класс содержит сортируемый вектор и методы для работы с ним
@@ -29,7 +29,7 @@ public:
     Manager(std::vector<int>& sourceVec, int threadsTotal);
     // метод принимает длину сортируемого вектора
     // и вносит индексы (начало 0 и конец vecSize) в очередь для обработки
-    void addWork(int vecSize);
+    void addWork(size_t vecSize);
 
     bool isJobDone();
     void jobIsDone();

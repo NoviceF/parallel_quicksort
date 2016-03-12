@@ -29,7 +29,7 @@ int main(int argc, char* argv[])
     algorithmsTest(params, logger);
 //    structsTest(params, logger);
 
-    logger.printTimeTable(CSort<int>::Name);
+    logger.printTimeTable(STLSort<int>::Name);
 //    logger.printTimeTable(stlSortInt::Name);
 //    logger.PrintTimeTable(posixSortInt::Name);
 
@@ -49,8 +49,8 @@ static void runTest(const ParsedParams& params, Logger& logger)
 void algorithmsTest(const ParsedParams& params, Logger& logger)
 {
 //    runTest<SingleThreadTestRunner, CSort<int> >(params, logger);
-//    runTest<SingleThreadTestRunner, STLSort<int> >(params, logger);
-//    runTest<MultiThreadTestRunner, PosixParallelSort<int> >(params, logger);
+    runTest<SingleThreadTestRunner, STLSort<int> >(params, logger);
+    runTest<MultiThreadTestRunner, PosixParallelSort<int> >(params, logger);
 //    runTest<MultiThreadTestRunner, Cpp11ParallelSortAsync<int> >(params, logger);
 //    runTest<MultiThreadTestRunner, Cpp11ParallelSortPartitioning<int> >(
 //                params, logger);
