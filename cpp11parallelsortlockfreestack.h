@@ -41,6 +41,7 @@ public:
     {
         assert(std::atomic<Indeces>().is_lock_free());
 //        MultiThreadSort<T>::m_vecToSort = { 5, 2, 0, 1, 6, 3};
+//        MultiThreadSort<T>::m_vecToSort = { 5, 5, 5, 1, 6, 6, 1, 6, 4};
         m_stack.push({ 0, MultiThreadSort<T>::m_vecToSort.size() - 1 });
         MultiThreadSort<T>::initTask();
     }
@@ -90,10 +91,11 @@ public:
 
             std::vector<T>& input = MultiThreadSort<T>::m_vecToSort;
 
-            size_t pivotPos = 0;
-            quicksort(input, indcs.begin, indcs.end, &pivotPos);
-            Indeces lowerPart = { indcs.begin, pivotPos ? pivotPos - 1 : 0 };
-            Indeces higherPart = { pivotPos + 1, indcs.end };
+            size_t middle1Pos = 0;
+            size_t middle2Pos = 0;
+            partitionStl(input, indcs.begin, indcs.end, middle1Pos, middle2Pos);
+            Indeces lowerPart = { indcs.begin, middle1Pos ? middle1Pos - 1 : 0 };
+            Indeces higherPart = { middle2Pos, indcs.end };
 
             if (lowerPart.begin < lowerPart.end)
                 m_stack.push(lowerPart);
