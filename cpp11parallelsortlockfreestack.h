@@ -75,7 +75,7 @@ public:
                         return;
                     }
 
-                    if (!m_jobIsDone.load())
+//                    if (!m_jobIsDone.load())
                         m_condVar.wait(lock);
 
                     m_threadsWaitingCounter.fetch_sub(1);
@@ -97,31 +97,28 @@ public:
             Indeces lowerPart = { indcs.begin, middle1Pos ? middle1Pos - 1 : 0 };
             Indeces higherPart = { middle2Pos, indcs.end };
 
-            if (lowerPart.begin < lowerPart.end)
-                m_stack.push(lowerPart);
-
-            if (higherPart.begin < higherPart.end)
+            auto fillStacks = [&](const Indeces& ind)
             {
-                if (m_threadsWaitingCounter.load())
+                if (ind.begin < ind.end)
                 {
-                    std::unique_lock<std::mutex> lock(m_condMutex);
-
-                    if (m_threadsWaitingCounter.load())
+                    // the value MultiThreadSort<T>::threadsCount() / 2
+                    // is chosen empirically
+                    if (localStack.empty()
+                            || m_threadsWaitingCounter.load()
+                               < MultiThreadSort<T>::threadsCount() / 2)
                     {
-                        m_stack.push(higherPart);
-                        m_condVar.notify_one();
+                        localStack.push(ind);
                     }
                     else
                     {
-                        lock.unlock();
-                        localStack.push(higherPart);
+                        m_stack.push(ind);
+                        m_condVar.notify_one();
                     }
                 }
-                else
-                {
-                    localStack.push(higherPart);
-                }
-            }
+            };
+
+            fillStacks(lowerPart);
+            fillStacks(higherPart);
         }
     }
 
@@ -156,20 +153,6 @@ private:
 
 template <typename T>
 const std::string Cpp11ParallelSortLockFreeStack<T>::Name = "LFS";
-
-//            T const pivot = input[indcs.begin];
-
-//            using vecIter = typename std::vector<T>::iterator;
-//            vecIter beginIter = input.begin() + indcs.begin;
-//            vecIter endIter = (input.begin() + indcs.end) + 1;
-//            vecIter middle1 = std::partition(beginIter, endIter,
-//                                          [&](T const& t){ return t < pivot; });
-//            vecIter middle2 = std::partition(middle1, endIter,
-//                                          [&](T const& t){ return !(pivot < t); });
-//            const size_t middle1Pos = middle1 - input.begin();
-//            const size_t middle2Pos = middle2 - input.begin();
-//            Indeces lowerPart = { indcs.begin, middle1Pos ? middle1Pos - 1 : 0};
-//            Indeces higherPart = { middle2Pos, indcs.end };
 
 
 #endif // CPP11PARALLELSORTLOCKFREESTACK_H
